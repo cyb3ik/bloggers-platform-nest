@@ -66,7 +66,7 @@ export class Comment {
         return comment as CommentDocument
     }
 
-    makeDeleted() {
+    softDeleteSelf() {
         if (this.deletedAt !== null) {
             throw new Error('Entity already deleted');
         }

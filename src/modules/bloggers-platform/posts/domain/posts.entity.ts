@@ -44,7 +44,7 @@ export class Post {
         return post as PostDocument
     }
 
-    makeDeleted() {
+    softDeleteSelf() {
         if (this.deletedAt !== null) {
             throw new Error('Entity already deleted');
         }

@@ -35,7 +35,7 @@ export class UsersService {
     async deleteUser(id: string) {
         const user = await this.usersRepository.findUserByIdOrFail(id);
 
-        user.makeDeleted();
+        user.softDeleteSelf();
 
         await this.usersRepository.save(user);
     }

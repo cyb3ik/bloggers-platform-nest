@@ -33,7 +33,7 @@ export class User {
         return user as UserDocument
     }
 
-    makeDeleted() {
+    softDeleteSelf() {
         if (this.deletedAt !== null) {
             throw new Error('Entity already deleted');
         }

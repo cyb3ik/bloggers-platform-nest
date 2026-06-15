@@ -33,7 +33,7 @@ export class Blog {
         return blog as BlogDocument
     }
 
-    makeDeleted() {
+    softDeleteSelf() {
         if (this.deletedAt !== null) {
             throw new Error('Entity already deleted');
         }
