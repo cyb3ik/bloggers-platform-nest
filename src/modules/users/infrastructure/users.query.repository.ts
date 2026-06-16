@@ -1,5 +1,5 @@
 import { InjectModel } from '@nestjs/mongoose';
-import { User, UserDocument } from '../domain/user.entity';
+import { User } from '../domain/user.entity';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import type { UserModelType } from '../domain/user.entity';
 import { UserViewDto } from '../api/dto/users.view-dto';
@@ -8,7 +8,7 @@ import { PaginatedViewDto } from '../../../core/dto/paginated.view-dto';
 
 @Injectable()
 export class UsersQueryRepository {
-    constructor(@InjectModel(User.name) private UserModel: UserModelType) { }
+    constructor(@InjectModel(User.name) private readonly UserModel: UserModelType) { }
 
     async findUserByIdOrFail(id: string): Promise<UserViewDto> {
         const user = await this.UserModel.findOne({

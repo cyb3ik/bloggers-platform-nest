@@ -2,6 +2,7 @@ import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { LikesInfo } from "../../comments/domain/comment.entity";
 import { CreateDomainPostDto } from "./dto/posts.domain-dto";
 import { HydratedDocument, Model } from "mongoose";
+import { UpdatePostInputDto } from "../api/dto/posts.input-dto";
 
 @Schema({ timestamps: true })
 export class Post {
@@ -46,9 +47,17 @@ export class Post {
 
     softDeleteSelf() {
         if (this.deletedAt !== null) {
-            throw new Error('Entity already deleted');
+            throw new Error('Entity already deleted')
         }
-        this.deletedAt = new Date();
+        this.deletedAt = new Date()
+    }
+
+    update(dto: UpdatePostInputDto & { blogName: string }): void {
+        this.title = dto.title
+        this.shortDescription = dto.shortDescription
+        this.content = dto.content
+        this.blogId = dto.blogId
+        this.blogName = dto.blogName
     }
 }
 

@@ -78,4 +78,4 @@ export const CommentSchema = SchemaFactory.createForClass(Comment)
 CommentSchema.loadClass(Comment)
 
 export type CommentDocument = HydratedDocument<Comment>
-export type BlogModelType = Model<CommentDocument> & typeof Comment
+export type CommentModelType = Model<CommentDocument> & typeof Comment

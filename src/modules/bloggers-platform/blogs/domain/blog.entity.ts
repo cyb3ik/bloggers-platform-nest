@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { HydratedDocument, Model } from "mongoose";
 import { CreateDomainBlogDto } from "./dto/blog.domain-dto";
+import { UpdateBlogInputDto } from "../api/dto/blogs.input-dto";
 
 @Schema({ timestamps: true })
 export class Blog {
@@ -38,6 +39,12 @@ export class Blog {
             throw new Error('Entity already deleted');
         }
         this.deletedAt = new Date();
+    }
+
+    update(dto: UpdateBlogInputDto): void {
+        this.name = dto.name
+        this.description = dto.description
+        this.websiteUrl = dto.websiteUrl
     }
 }
 

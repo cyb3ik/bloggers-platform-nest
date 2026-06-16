@@ -1,5 +1,5 @@
 import { LikesInfo, LikeStatus } from '../../../comments/domain/comment.entity';
-import { PostDocument } from '../../domain/posts.entity';
+import { PostDocument } from '../../domain/post.entity';
 
 export class PostViewDto {
     id: string
@@ -21,7 +21,8 @@ export class PostViewDto {
         this.blogName = post.blogName
         this.createdAt = post.createdAt
         this.extendedLikesInfo = {
-            ...post.likesInfo,
+            likesCount: post.likesInfo.likesCount,
+            dislikesCount: post.likesInfo.dislikesCount,
             myStatus: likeStatus,
             newestLikes: newestLikes
         }

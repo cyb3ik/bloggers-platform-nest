@@ -10,15 +10,15 @@ import { BcryptService } from './bcrypt.service';
 export class UsersService {
     constructor(
         @InjectModel(User.name)
-        private UserModel: UserModelType,
-        private usersRepository: UsersRepository,
-        private cryptoService: BcryptService
+        private readonly UserModel: UserModelType,
+        private readonly UsersRepository: UsersRepository,
+        private readonly CryptoService: BcryptService
     ) { }
 
     async createUser(dto: CreateUserInputDto): Promise<string> {
 
-        const passwordSalt = await this.cryptoService.generateSalt(10)
-        const passwordHash = await this.cryptoService.generateHash(dto.password, passwordSalt)
+        const passwordSalt = await this.CryptoService.generateSalt(10)
+        const passwordHash = await this.CryptoService.generateHash(dto.password, passwordSalt)
 
         const user = this.UserModel.createInstance({
             email: dto.email,
@@ -27,16 +27,16 @@ export class UsersService {
             passwordHash: passwordHash
         })
 
-        await this.usersRepository.save(user)
+        await this.UsersRepository.save(user)
 
         return user._id.toString()
     }
 
-    async deleteUser(id: string) {
-        const user = await this.usersRepository.findUserByIdOrFail(id);
+    async deleteUserById(id: string): Promise<void> {
+        const user = await this.UsersRepository.findUserByIdOrFail(id)
 
-        user.softDeleteSelf();
+        user.softDeleteSelf()
 
-        await this.usersRepository.save(user);
+        await this.UsersRepository.save(user)
     }
 }

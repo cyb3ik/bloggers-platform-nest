@@ -5,7 +5,7 @@ import type { UserModelType } from '../domain/user.entity';
 
 @Injectable()
 export class UsersRepository {
-    constructor(@InjectModel(User.name) private UserModel: UserModelType) { }
+    constructor(@InjectModel(User.name) private readonly UserModel: UserModelType) { }
 
     async save(user: UserDocument) {
         await user.save()
@@ -19,7 +19,7 @@ export class UsersRepository {
 
         if (!user) {
             //TODO: replace with domain exception
-            throw new NotFoundException('user not found')
+            throw new NotFoundException('User not found')
         }
 
         return user

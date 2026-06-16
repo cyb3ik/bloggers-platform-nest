@@ -3,3 +3,5 @@ export class CreateBlogInputDto {
     description: string
     websiteUrl: string
 }
+
+export class UpdateBlogInputDto extends CreateBlogInputDto { }

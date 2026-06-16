@@ -11,4 +11,5 @@ enum BlogsSortBy {
 
 export class BlogsQueryParams extends BaseQueryParams {
     sortBy = BlogsSortBy.createdAt
+    searchNameTerm: string | null = null
 }

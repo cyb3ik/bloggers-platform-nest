@@ -8,6 +8,6 @@ enum CommentsSortBy {
     likesInfo = 'likesInfo'
 }
 
-export class UsersQueryParams extends BaseQueryParams {
+export class CommentsQueryParams extends BaseQueryParams {
     sortBy = CommentsSortBy.createdAt
 }
