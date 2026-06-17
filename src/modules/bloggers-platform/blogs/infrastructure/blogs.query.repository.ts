@@ -5,6 +5,7 @@ import type { BlogModelType } from "../domain/blog.entity";
 import { BlogViewDto } from "../api/dto/blogs.view-dto";
 import { BlogsQueryParams } from "../api/dto/blogs.query.params-dto";
 import { PaginatedViewDto } from "../../../../core/dto/paginated.view-dto";
+import { Types } from "mongoose";
 
 
 @Injectable()
@@ -12,6 +13,9 @@ export class BlogsQueryRepository {
     constructor(@InjectModel(Blog.name) private readonly BlogModel: BlogModelType) { }
 
     async findBlogByIdOrFail(id: string): Promise<BlogViewDto> {
+        if (!Types.ObjectId.isValid(id)) {
+            throw new NotFoundException('Blog not found')
+        }
         const blog = await this.BlogModel.findOne({
             _id: id,
             deletedAt: null,

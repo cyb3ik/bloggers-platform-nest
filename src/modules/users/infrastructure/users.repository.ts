@@ -2,6 +2,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from '../domain/user.entity';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import type { UserModelType } from '../domain/user.entity';
+import { Types } from 'mongoose';
 
 @Injectable()
 export class UsersRepository {
@@ -12,6 +13,9 @@ export class UsersRepository {
     }
 
     async findUserByIdOrFail(id: string): Promise<UserDocument> {
+        if (!Types.ObjectId.isValid(id)) {
+            throw new NotFoundException('User not found')
+        }
         const user = await this.UserModel.findOne({
             _id: id,
             deletedAt: null,
