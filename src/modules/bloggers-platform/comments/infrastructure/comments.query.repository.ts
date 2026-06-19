@@ -4,16 +4,12 @@ import { InjectModel } from "@nestjs/mongoose";
 import { CommentViewDto } from "../api/dto/comments.view-dto";
 import { CommentsQueryParams } from "../api/dto/comments.query.params-dto";
 import { PaginatedViewDto } from "../../../../core/dto/paginated.view-dto";
-import { Types } from "mongoose";
 
 @Injectable()
 export class CommentsQueryRepository {
     constructor(@InjectModel(Comment.name) private readonly CommentModel: CommentModelType) { }
 
     async findCommentByIdOrFail(id: string): Promise<CommentViewDto> {
-        if (!Types.ObjectId.isValid(id)) {
-            throw new NotFoundException('Comment not found')
-        }
         const comment = await this.CommentModel.findOne({
             _id: id,
             deletedAt: null,

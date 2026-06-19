@@ -7,6 +7,7 @@ import { BlogsService } from "../application/blogs.service";
 import { BlogsQueryRepository } from "../infrastructure/blogs.query.repository";
 import { PostsService } from "../../posts/application/posts.service";
 import { PostsQueryRepository } from "../../posts/infrastructure/posts.query.repository";
+import { ParseObjectIdPipe } from "@nestjs/mongoose";
 
 @Controller('blogs')
 export class BlogsController {
@@ -25,14 +26,14 @@ export class BlogsController {
 
     @Get(':id')
     @HttpCode(HttpStatus.OK)
-    async findBlogById(@Param('id') id: string) {
+    async findBlogById(@Param('id', ParseObjectIdPipe) id: string) {
         return this.BlogsQueryRepository.findBlogByIdOrFail(id)
     }
 
     @Get(':blogId/posts')
     @HttpCode(HttpStatus.OK)
     async findAllPostsFromBlog(
-        @Param('blogId') blogId: string,
+        @Param('blogId', ParseObjectIdPipe) blogId: string,
         @Query() query: PostsQueryParams) {
         // TOCHECK спросить как лучше такое реализовать - в квери сервисе или оставить как есть
         await this.BlogsQueryRepository.findBlogByIdOrFail(blogId)
@@ -51,7 +52,7 @@ export class BlogsController {
     @Post(':blogId/posts')
     @HttpCode(HttpStatus.CREATED)
     async createPostForBlog(
-        @Param('blogId') blogId: string,
+        @Param('blogId', ParseObjectIdPipe) blogId: string,
         @Body() dto: CreatePostForBlogInputDto) {
 
         const createdPostId = await this.PostsService.createPostForBlog(dto, blogId)
@@ -62,7 +63,7 @@ export class BlogsController {
     @Put(':id')
     @HttpCode(HttpStatus.NO_CONTENT)
     async updateBlogById(
-        @Param('id') id: string,
+        @Param('id', ParseObjectIdPipe) id: string,
         @Body() dto: UpdateBlogInputDto) {
 
         return this.BlogsService.updateBlogById(id, dto)
@@ -70,7 +71,7 @@ export class BlogsController {
 
     @Delete(':id')
     @HttpCode(HttpStatus.NO_CONTENT)
-    async deleteBlogById(@Param('id') id: string) {
+    async deleteBlogById(@Param('id', ParseObjectIdPipe) id: string) {
         return this.BlogsService.deleteBlogById(id)
     }
 }

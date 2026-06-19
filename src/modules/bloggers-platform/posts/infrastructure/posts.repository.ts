@@ -13,9 +13,6 @@ export class PostsRepository {
     }
 
     async findPostByIdOrFail(id: string): Promise<PostDocument> {
-        if (!Types.ObjectId.isValid(id)) {
-            throw new NotFoundException('Post not found')
-        }
         const post = await this.PostModel.findOne({
             _id: id,
             deletedAt: null,

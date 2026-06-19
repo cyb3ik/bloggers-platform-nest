@@ -3,6 +3,7 @@ import { UsersService } from '../application/users.service';
 import { CreateUserInputDto } from './dto/users.input-dto';
 import { UsersQueryRepository } from '../infrastructure/users.query.repository';
 import { UsersQueryParams } from './dto/users.query.params-dto';
+import { ParseObjectIdPipe } from '@nestjs/mongoose';
 
 @Controller('users')
 export class UsersController {
@@ -20,7 +21,7 @@ export class UsersController {
 
     @Get(':id')
     @HttpCode(HttpStatus.OK)
-    async findUserById(@Param('id') id: string) {
+    async findUserById(@Param('id', ParseObjectIdPipe) id: string) {
         return this.UsersQueryRepository.findUserByIdOrFail(id)
     }
 
@@ -34,7 +35,7 @@ export class UsersController {
 
     @Delete(':id')
     @HttpCode(HttpStatus.NO_CONTENT)
-    async deleteUserById(@Param('id') id: string) {
+    async deleteUserById(@Param('id', ParseObjectIdPipe) id: string) {
         return this.UsersService.deleteUserById(id)
     }
 }

@@ -5,6 +5,7 @@ import { CreatePostInputDto, UpdatePostInputDto } from "./dto/posts.input-dto";
 import { PostsService } from "../application/posts.service";
 import { PostsQueryRepository } from "../infrastructure/posts.query.repository";
 import { CommentsQueryRepository } from "../../comments/infrastructure/comments.query.repository";
+import { ParseObjectIdPipe } from "@nestjs/mongoose";
 
 
 @Controller('posts')
@@ -24,14 +25,14 @@ export class PostsController {
 
     @Get(':id')
     @HttpCode(HttpStatus.OK)
-    async findPostById(@Param('id') id: string) {
+    async findPostById(@Param('id', ParseObjectIdPipe) id: string) {
         return this.PostsQueryRepository.findPostByIdOrFail(id)
     }
 
     @Get(':postId/comments')
     @HttpCode(HttpStatus.OK)
     async findAllCommentsFromPost(
-        @Param('postId') postId: string,
+        @Param('postId', ParseObjectIdPipe) postId: string,
         @Query() query: CommentsQueryParams) {
 
         // TOCHECK спросить как лучше такое реализовать - в квери сервисе или оставить как есть
@@ -62,7 +63,7 @@ export class PostsController {
     @Put(':id')
     @HttpCode(HttpStatus.NO_CONTENT)
     async updatePostById(
-        @Param('id') id: string,
+        @Param('id', ParseObjectIdPipe) id: string,
         @Body() dto: UpdatePostInputDto) {
 
         await this.PostsQueryRepository.findPostByIdOrFail(id)
@@ -72,7 +73,7 @@ export class PostsController {
 
     @Delete(':id')
     @HttpCode(HttpStatus.NO_CONTENT)
-    async deletePostById(@Param('id') id: string) {
+    async deletePostById(@Param('id', ParseObjectIdPipe) id: string) {
         return this.PostsService.deletePostById(id)
     }
 }

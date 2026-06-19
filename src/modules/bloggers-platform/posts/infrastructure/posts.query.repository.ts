@@ -5,7 +5,6 @@ import { PaginatedViewDto } from "../../../../core/dto/paginated.view-dto";
 import { Post } from "../domain/post.entity";
 import { PostViewDto } from "../api/dto/posts.view-dto";
 import { PostsQueryParams } from "../api/dto/posts.query.params-dto";
-import { Types } from "mongoose";
 
 
 @Injectable()
@@ -13,9 +12,6 @@ export class PostsQueryRepository {
     constructor(@InjectModel(Post.name) private readonly PostModel: PostModelType) { }
 
     async findPostByIdOrFail(id: string): Promise<PostViewDto> {
-        if (!Types.ObjectId.isValid(id)) {
-            throw new NotFoundException('Post not found')
-        }
         const post = await this.PostModel.findOne({
             _id: id,
             deletedAt: null,

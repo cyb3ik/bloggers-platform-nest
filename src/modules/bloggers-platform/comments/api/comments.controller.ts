@@ -1,5 +1,6 @@
 import { Controller, Get, HttpCode, HttpStatus, Param } from "@nestjs/common";
 import { CommentsQueryRepository } from "../infrastructure/comments.query.repository";
+import { ParseObjectIdPipe } from "@nestjs/mongoose";
 
 @Controller('comments')
 export class CommentsController {
@@ -9,7 +10,7 @@ export class CommentsController {
 
     @Get('id')
     @HttpCode(HttpStatus.OK)
-    async findCommentById(@Param('id') id: string) {
+    async findCommentById(@Param('id', ParseObjectIdPipe) id: string) {
         return this.CommentsQueryRepository.findCommentByIdOrFail(id)
     }
 }
