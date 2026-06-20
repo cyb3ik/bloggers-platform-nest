@@ -1,3 +1,4 @@
+import { IsEnum, IsOptional, IsString } from "class-validator";
 import { BaseQueryParams } from "../../../../../core/dto/query.params.input-dto";
 
 enum BlogsSortBy {
@@ -10,6 +11,10 @@ enum BlogsSortBy {
 }
 
 export class BlogsQueryParams extends BaseQueryParams {
+    @IsEnum(BlogsSortBy)
     sortBy = BlogsSortBy.createdAt
+
+    @IsString()
+    @IsOptional()
     searchNameTerm: string | null = null
 }
