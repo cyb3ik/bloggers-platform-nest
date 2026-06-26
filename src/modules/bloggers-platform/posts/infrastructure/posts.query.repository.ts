@@ -5,13 +5,14 @@ import { PaginatedViewDto } from "../../../../core/dto/paginated.view-dto";
 import { Post } from "../domain/post.entity";
 import { PostViewDto } from "../api/dto/posts.view-dto";
 import { PostsQueryParams } from "../api/dto/posts.query.params-dto";
+import { Types } from "mongoose";
 
 
 @Injectable()
 export class PostsQueryRepository {
     constructor(@InjectModel(Post.name) private readonly PostModel: PostModelType) { }
 
-    async findPostByIdOrFail(id: string): Promise<PostViewDto> {
+    async findPostByIdOrFail(id: Types.ObjectId): Promise<PostViewDto> {
         const post = await this.PostModel.findOne({
             _id: id,
             deletedAt: null,
@@ -49,7 +50,7 @@ export class PostsQueryRepository {
         })
     }
 
-    async findAllPostsFromBlog(blogId: string, query: PostsQueryParams): Promise<PaginatedViewDto<PostViewDto[]>> {
+    async findAllPostsFromBlog(blogId: Types.ObjectId, query: PostsQueryParams): Promise<PaginatedViewDto<PostViewDto[]>> {
 
         const { pageNumber, pageSize, sortBy, sortDirection } = query
 

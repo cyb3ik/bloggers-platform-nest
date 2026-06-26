@@ -17,6 +17,10 @@ import { BcryptService } from './application/bcrypt.service';
     UsersQueryRepository,
     BcryptService
   ],
-  controllers: [UsersController]
+  controllers: [UsersController],
+  exports: [
+    UsersService,
+    UsersRepository,
+    BcryptService]
 })
 export class UsersModule { }

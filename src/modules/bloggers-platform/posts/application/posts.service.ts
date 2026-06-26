@@ -4,6 +4,7 @@ import { Post, type PostModelType } from "../domain/post.entity";
 import { CreatePostForBlogInputDto, CreatePostInputDto, UpdatePostInputDto } from "../api/dto/posts.input-dto";
 import { BlogsRepository } from "../../blogs/infrastructure/blogs.repository";
 import { PostsRepository } from "../infrastructure/posts.repository";
+import { Types } from "mongoose";
 
 
 @Injectable()
@@ -16,7 +17,7 @@ export class PostsService {
     ) { }
 
     async createPost(dto: CreatePostInputDto): Promise<string> {
-        const blog = await this.BlogsRepository.findBlogByIdOrFail(dto.blogId)
+        const blog = await this.BlogsRepository.findBlogByIdOrFail(new Types.ObjectId(dto.blogId))
 
         const post = this.PostModel.createInstance({
             title: dto.title,
@@ -31,24 +32,24 @@ export class PostsService {
         return post._id.toString()
     }
 
-    async createPostForBlog(dto: CreatePostForBlogInputDto, blogId: string): Promise<string> {
+    async createPostForBlog(dto: CreatePostForBlogInputDto, blogId: Types.ObjectId): Promise<Types.ObjectId> {
         const blog = await this.BlogsRepository.findBlogByIdOrFail(blogId)
 
         const post = this.PostModel.createInstance({
             title: dto.title,
             shortDescription: dto.shortDescription,
             content: dto.content,
-            blogId: blogId,
+            blogId: blogId.toString(),
             blogName: blog.name
         })
 
         await this.PostsRepository.save(post)
 
-        return post._id.toString()
+        return post._id
     }
 
-    async updatePostById(id: string, dto: UpdatePostInputDto): Promise<void> {
-        const blog = await this.BlogsRepository.findBlogByIdOrFail(dto.blogId)
+    async updatePostById(id: Types.ObjectId, dto: UpdatePostInputDto): Promise<void> {
+        const blog = await this.BlogsRepository.findBlogByIdOrFail(new Types.ObjectId(dto.blogId))
 
         const post = await this.PostsRepository.findPostByIdOrFail(id)
 
@@ -60,7 +61,7 @@ export class PostsService {
         await this.PostsRepository.save(post)
     }
 
-    async deletePostById(id: string): Promise<void> {
+    async deletePostById(id: Types.ObjectId): Promise<void> {
         const post = await this.PostsRepository.findPostByIdOrFail(id)
 
         post.softDeleteSelf()

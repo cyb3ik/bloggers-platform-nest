@@ -5,16 +5,17 @@ import type { UserModelType } from '../domain/user.entity';
 import { UserViewDto } from '../api/dto/users.view-dto';
 import { UsersQueryParams } from '../api/dto/users.query.params-dto';
 import { PaginatedViewDto } from '../../../core/dto/paginated.view-dto';
+import { Types } from 'mongoose';
 
 @Injectable()
 export class UsersQueryRepository {
     constructor(@InjectModel(User.name) private readonly UserModel: UserModelType) { }
 
-    async findUserByIdOrFail(id: string): Promise<UserViewDto> {
+    async findUserByIdOrFail(id: Types.ObjectId): Promise<UserViewDto> {
         const user = await this.UserModel.findOne({
             _id: id,
             deletedAt: null,
-        });
+        })
 
         if (!user) {
             throw new NotFoundException('User not found')

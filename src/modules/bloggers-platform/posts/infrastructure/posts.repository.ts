@@ -12,7 +12,7 @@ export class PostsRepository {
         await post.save()
     }
 
-    async findPostByIdOrFail(id: string): Promise<PostDocument> {
+    async findPostByIdOrFail(id: Types.ObjectId): Promise<PostDocument> {
         const post = await this.PostModel.findOne({
             _id: id,
             deletedAt: null,

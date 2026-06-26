@@ -2,6 +2,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from '../domain/user.entity';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import type { UserModelType } from '../domain/user.entity';
+import { Types } from 'mongoose';
 
 @Injectable()
 export class UsersRepository {
@@ -11,16 +12,61 @@ export class UsersRepository {
         await user.save()
     }
 
-    async findUserByIdOrFail(id: string): Promise<UserDocument> {
+    async findUserByIdOrFail(id: Types.ObjectId): Promise<UserDocument | null> {
         const user = await this.UserModel.findOne({
             _id: id,
             deletedAt: null,
         })
 
-        if (!user) {
-            //TODO: replace with domain exception
-            throw new NotFoundException('User not found')
-        }
+        return user
+    }
+
+    async findUserByEmailOrLogin(email: string, login: string): Promise<UserDocument | null> {
+        const user = await this.UserModel.findOne({
+            $or: [
+                { login: login },
+                { email: email }
+            ],
+            deletedAt: null,
+        })
+
+        return user
+    }
+
+    async findUserByEmail(email: string): Promise<UserDocument | null> {
+        const user = await this.UserModel.findOne({
+            email: email,
+            deletedAt: null,
+        })
+
+        return user
+    }
+
+    async findUserByLogin(login: string): Promise<UserDocument | null> {
+        const user = await this.UserModel.findOne({
+            login: login,
+            deletedAt: null,
+        })
+
+        return user
+    }
+
+    async findUserByConfirmationCodeOrFail(code: string): Promise<UserDocument | null> {
+        const user = await this.UserModel.findOne(
+            {
+                "emailConfirmation.confirmationCode": code,
+                deletedAt: null
+            })
+
+        return user
+    }
+
+    async findUserByRecoveryCodeOrFail(code: string): Promise<UserDocument | null> {
+        const user = await this.UserModel.findOne(
+            {
+                "passwordRecovery.recoveryCode": code,
+                deletedAt: null
+            })
 
         return user
     }

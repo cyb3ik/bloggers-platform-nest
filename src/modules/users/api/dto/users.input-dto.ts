@@ -17,6 +17,6 @@ export class CreateUserInputDto {
     @IsString()
     @Trim()
     @IsNotEmpty()
-    @Length(3, 10)
+    @Length(6, 20)
     password: string
 }

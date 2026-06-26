@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { HttpExceptionFilter } from './core/exception-filters/http.exception.filter';
+import { ObjectIdValidationPipe } from './core/pipes/object-id-validation.pipe';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule)
@@ -12,6 +13,7 @@ async function bootstrap() {
       transform: true,
       whitelist: true,
       stopAtFirstError: true,
+      forbidNonWhitelisted: true,
 
       exceptionFactory: (errors) => {
         const errorsRes = errors.map(e => {
@@ -24,10 +26,12 @@ async function bootstrap() {
         })
         throw new BadRequestException(errorsRes)
       }
-    }))
+    }),
+    new ObjectIdValidationPipe())
 
   app.useGlobalFilters(new HttpExceptionFilter())
 
   await app.listen(process.env.PORT ?? 5002)
 }
+
 bootstrap()

@@ -4,6 +4,7 @@ import { Blog } from "../domain/blog.entity";
 import type { BlogModelType } from "../domain/blog.entity";
 import { CreateBlogInputDto, UpdateBlogInputDto } from "../api/dto/blogs.input-dto";
 import { BlogsRepository } from "../infrastructure/blogs.repository";
+import { Types } from "mongoose";
 
 @Injectable()
 export class BlogsService {
@@ -13,7 +14,7 @@ export class BlogsService {
         private readonly BlogsRepository: BlogsRepository
     ) { }
 
-    async createBlog(dto: CreateBlogInputDto): Promise<string> {
+    async createBlog(dto: CreateBlogInputDto): Promise<Types.ObjectId> {
         const blog = this.BlogModel.createInstance({
             name: dto.name,
             description: dto.description,
@@ -23,10 +24,10 @@ export class BlogsService {
 
         await this.BlogsRepository.save(blog)
 
-        return blog._id.toString()
+        return blog._id
     }
 
-    async updateBlogById(id: string, dto: UpdateBlogInputDto): Promise<void> {
+    async updateBlogById(id: Types.ObjectId, dto: UpdateBlogInputDto): Promise<void> {
         const blog = await this.BlogsRepository.findBlogByIdOrFail(id)
 
         blog.update(dto)
@@ -34,7 +35,7 @@ export class BlogsService {
         await this.BlogsRepository.save(blog)
     }
 
-    async deleteBlogById(id: string): Promise<void> {
+    async deleteBlogById(id: Types.ObjectId): Promise<void> {
         const blog = await this.BlogsRepository.findBlogByIdOrFail(id)
 
         blog.softDeleteSelf()

@@ -6,6 +6,8 @@ import { PostsService } from "../application/posts.service";
 import { PostsQueryRepository } from "../infrastructure/posts.query.repository";
 import { CommentsQueryRepository } from "../../comments/infrastructure/comments.query.repository";
 import { ParseObjectIdPipe } from "@nestjs/mongoose";
+import { Types } from "mongoose";
+import { ObjectIdValidationPipe } from "../../../../core/pipes/object-id-validation.pipe";
 
 
 @Controller('posts')
@@ -25,14 +27,14 @@ export class PostsController {
 
     @Get(':id')
     @HttpCode(HttpStatus.OK)
-    async findPostById(@Param('id', ParseObjectIdPipe) id: string) {
+    async findPostById(@Param('id') id: Types.ObjectId) {
         return this.PostsQueryRepository.findPostByIdOrFail(id)
     }
 
     @Get(':postId/comments')
     @HttpCode(HttpStatus.OK)
     async findAllCommentsFromPost(
-        @Param('postId', ParseObjectIdPipe) postId: string,
+        @Param('postId') postId: Types.ObjectId,
         @Query() query: CommentsQueryParams) {
 
         // TOCHECK спросить как лучше такое реализовать - в квери сервисе или оставить как есть
@@ -46,7 +48,7 @@ export class PostsController {
     async createPost(@Body() dto: CreatePostInputDto) {
         const createdPostId = await this.PostsService.createPost(dto)
 
-        return this.PostsQueryRepository.findPostByIdOrFail(createdPostId)
+        return this.PostsQueryRepository.findPostByIdOrFail(new Types.ObjectId(createdPostId))
     }
 
 
@@ -63,7 +65,7 @@ export class PostsController {
     @Put(':id')
     @HttpCode(HttpStatus.NO_CONTENT)
     async updatePostById(
-        @Param('id', ParseObjectIdPipe) id: string,
+        @Param('id') id: Types.ObjectId,
         @Body() dto: UpdatePostInputDto) {
 
         await this.PostsQueryRepository.findPostByIdOrFail(id)
@@ -73,7 +75,7 @@ export class PostsController {
 
     @Delete(':id')
     @HttpCode(HttpStatus.NO_CONTENT)
-    async deletePostById(@Param('id', ParseObjectIdPipe) id: string) {
+    async deletePostById(@Param('id') id: Types.ObjectId) {
         return this.PostsService.deletePostById(id)
     }
 }

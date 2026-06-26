@@ -8,6 +8,7 @@ import { BlogsQueryRepository } from "../infrastructure/blogs.query.repository";
 import { PostsService } from "../../posts/application/posts.service";
 import { PostsQueryRepository } from "../../posts/infrastructure/posts.query.repository";
 import { ParseObjectIdPipe } from "@nestjs/mongoose";
+import { Types } from "mongoose";
 
 @Controller('blogs')
 export class BlogsController {
@@ -26,14 +27,14 @@ export class BlogsController {
 
     @Get(':id')
     @HttpCode(HttpStatus.OK)
-    async findBlogById(@Param('id', ParseObjectIdPipe) id: string) {
+    async findBlogById(@Param('id') id: Types.ObjectId) {
         return this.BlogsQueryRepository.findBlogByIdOrFail(id)
     }
 
     @Get(':blogId/posts')
     @HttpCode(HttpStatus.OK)
     async findAllPostsFromBlog(
-        @Param('blogId', ParseObjectIdPipe) blogId: string,
+        @Param('blogId') blogId: Types.ObjectId,
         @Query() query: PostsQueryParams) {
         // TOCHECK спросить как лучше такое реализовать - в квери сервисе или оставить как есть
         await this.BlogsQueryRepository.findBlogByIdOrFail(blogId)
@@ -52,7 +53,7 @@ export class BlogsController {
     @Post(':blogId/posts')
     @HttpCode(HttpStatus.CREATED)
     async createPostForBlog(
-        @Param('blogId', ParseObjectIdPipe) blogId: string,
+        @Param('blogId') blogId: Types.ObjectId,
         @Body() dto: CreatePostForBlogInputDto) {
 
         const createdPostId = await this.PostsService.createPostForBlog(dto, blogId)
@@ -63,7 +64,7 @@ export class BlogsController {
     @Put(':id')
     @HttpCode(HttpStatus.NO_CONTENT)
     async updateBlogById(
-        @Param('id', ParseObjectIdPipe) id: string,
+        @Param('id') id: Types.ObjectId,
         @Body() dto: UpdateBlogInputDto) {
 
         return this.BlogsService.updateBlogById(id, dto)
@@ -71,7 +72,7 @@ export class BlogsController {
 
     @Delete(':id')
     @HttpCode(HttpStatus.NO_CONTENT)
-    async deleteBlogById(@Param('id', ParseObjectIdPipe) id: string) {
+    async deleteBlogById(@Param('id') id: Types.ObjectId) {
         return this.BlogsService.deleteBlogById(id)
     }
 }
