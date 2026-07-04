@@ -1,13 +1,7 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { HydratedDocument, Model } from "mongoose";
 import { CreateDomainCommentDto } from "./dto/comment.domain-dto";
-
-//TODO move to likes folder
-export enum LikeStatus {
-    None = 'None',
-    Like = 'Like',
-    Dislike = 'Dislike',
-}
+import { UpdateCommentInputDto } from "../api/dto/comments.input-dto";
 
 @Schema({ _id: false })
 export class CommentatorInfo {
@@ -71,6 +65,15 @@ export class Comment {
             throw new Error('Entity already deleted');
         }
         this.deletedAt = new Date();
+    }
+
+    update(dto: UpdateCommentInputDto) {
+        this.content = dto.content
+    }
+
+    updateLikesCount(likesCount: number, dislikesCount: number) {
+        this.likesInfo.likesCount += likesCount
+        this.likesInfo.dislikesCount += dislikesCount
     }
 }
 

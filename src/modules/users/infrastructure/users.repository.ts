@@ -1,6 +1,6 @@
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from '../domain/user.entity';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import type { UserModelType } from '../domain/user.entity';
 import { Types } from 'mongoose';
 
@@ -12,21 +12,22 @@ export class UsersRepository {
         await user.save()
     }
 
-    async findUserByIdOrFail(id: Types.ObjectId): Promise<UserDocument | null> {
-        const user = await this.UserModel.findOne({
-            _id: id,
-            deletedAt: null,
-        })
-
-        return user
+    async delete(user: UserDocument) {
+        user.softDeleteSelf()
     }
 
-    async findUserByEmailOrLogin(email: string, login: string): Promise<UserDocument | null> {
+    async updateUserPassword(user: UserDocument, newPasswordInfo: { passwordHash: string, passwordSalt: string }) {
+        const { passwordHash, passwordSalt } = newPasswordInfo
+
+        user.passwordHash = passwordHash
+        user.passwordSalt = passwordSalt
+
+        user.forbidPasswordRecovery()
+    }
+
+    async findUserById(id: Types.ObjectId): Promise<UserDocument | null> {
         const user = await this.UserModel.findOne({
-            $or: [
-                { login: login },
-                { email: email }
-            ],
+            _id: id,
             deletedAt: null,
         })
 
@@ -51,7 +52,7 @@ export class UsersRepository {
         return user
     }
 
-    async findUserByConfirmationCodeOrFail(code: string): Promise<UserDocument | null> {
+    async findUserByConfirmationCode(code: string): Promise<UserDocument | null> {
         const user = await this.UserModel.findOne(
             {
                 "emailConfirmation.confirmationCode": code,
@@ -61,7 +62,7 @@ export class UsersRepository {
         return user
     }
 
-    async findUserByRecoveryCodeOrFail(code: string): Promise<UserDocument | null> {
+    async findUserByRecoveryCode(code: string): Promise<UserDocument | null> {
         const user = await this.UserModel.findOne(
             {
                 "passwordRecovery.recoveryCode": code,

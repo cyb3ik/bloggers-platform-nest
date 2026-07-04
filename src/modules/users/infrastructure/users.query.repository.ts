@@ -11,14 +11,14 @@ import { Types } from 'mongoose';
 export class UsersQueryRepository {
     constructor(@InjectModel(User.name) private readonly UserModel: UserModelType) { }
 
-    async findUserByIdOrFail(id: Types.ObjectId): Promise<UserViewDto> {
+    async findUserById(id: Types.ObjectId): Promise<UserViewDto | null> {
         const user = await this.UserModel.findOne({
             _id: id,
             deletedAt: null,
         })
 
         if (!user) {
-            throw new NotFoundException('User not found')
+            return null
         }
 
         return new UserViewDto(user)

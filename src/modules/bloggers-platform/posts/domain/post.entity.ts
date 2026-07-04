@@ -59,6 +59,11 @@ export class Post {
         this.blogId = dto.blogId
         this.blogName = dto.blogName
     }
+
+    updateLikesCount(likesCount: number, dislikesCount: number) {
+        this.likesInfo.likesCount += likesCount
+        this.likesInfo.dislikesCount += dislikesCount
+    }
 }
 
 export const PostSchema = SchemaFactory.createForClass(Post)

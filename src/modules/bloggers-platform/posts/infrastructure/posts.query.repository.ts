@@ -12,14 +12,14 @@ import { Types } from "mongoose";
 export class PostsQueryRepository {
     constructor(@InjectModel(Post.name) private readonly PostModel: PostModelType) { }
 
-    async findPostByIdOrFail(id: Types.ObjectId): Promise<PostViewDto> {
+    async findPostById(id: Types.ObjectId): Promise<PostViewDto | null> {
         const post = await this.PostModel.findOne({
             _id: id,
             deletedAt: null,
         })
 
         if (!post) {
-            throw new NotFoundException('Post not found')
+            return null
         }
 
         return new PostViewDto(post)

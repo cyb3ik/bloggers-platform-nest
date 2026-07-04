@@ -12,14 +12,14 @@ import { Types } from "mongoose";
 export class BlogsQueryRepository {
     constructor(@InjectModel(Blog.name) private readonly BlogModel: BlogModelType) { }
 
-    async findBlogByIdOrFail(id: Types.ObjectId): Promise<BlogViewDto> {
+    async findBlogById(id: Types.ObjectId): Promise<BlogViewDto | null> {
         const blog = await this.BlogModel.findOne({
             _id: id,
             deletedAt: null,
         })
 
         if (!blog) {
-            throw new NotFoundException('Blog not found')
+            return null
         }
 
         return new BlogViewDto(blog)

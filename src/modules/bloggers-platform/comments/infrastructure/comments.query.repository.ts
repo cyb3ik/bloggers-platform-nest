@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
-import { Comment, type CommentModelType } from "../domain/comment.entity";
+import { Comment, CommentDocument, type CommentModelType } from "../domain/comment.entity";
 import { InjectModel } from "@nestjs/mongoose";
 import { CommentViewDto } from "../api/dto/comments.view-dto";
 import { CommentsQueryParams } from "../api/dto/comments.query.params-dto";
@@ -10,17 +10,13 @@ import { Types } from "mongoose";
 export class CommentsQueryRepository {
     constructor(@InjectModel(Comment.name) private readonly CommentModel: CommentModelType) { }
 
-    async findCommentByIdOrFail(id: Types.ObjectId): Promise<CommentViewDto> {
+    async findCommentById(id: Types.ObjectId): Promise<CommentDocument | null> {
         const comment = await this.CommentModel.findOne({
             _id: id,
             deletedAt: null,
         })
 
-        if (!comment) {
-            throw new NotFoundException('Comment not found')
-        }
-
-        return new CommentViewDto(comment)
+        return comment
     }
 
     async findAllCommentsFromPost(postId: Types.ObjectId, query: CommentsQueryParams): Promise<PaginatedViewDto<CommentViewDto[]>> {

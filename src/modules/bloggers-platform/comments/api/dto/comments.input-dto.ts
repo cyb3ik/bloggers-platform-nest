@@ -9,4 +9,4 @@ export class CreateCommentInputDto {
     content: string
 }
 
-export class CreateCommentForPostInputDto extends CreateCommentInputDto { }
+export class UpdateCommentInputDto extends CreateCommentInputDto { }

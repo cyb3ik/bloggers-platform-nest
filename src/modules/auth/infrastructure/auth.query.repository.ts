@@ -9,10 +9,14 @@ export class AuthQueryRepository {
     constructor(
         private readonly UsersRepository: UsersRepository
     ) { }
-    async getMePage(id: string) {
-        const user = await this.UsersRepository.findUserByIdOrFail(
-            new Types.ObjectId(id)
+    async getMePage(id: Types.ObjectId) {
+        const user = await this.UsersRepository.findUserById(
+            id
         )
+
+        if (!user) {
+            return null
+        }
 
         return new MePageView(user)
     }

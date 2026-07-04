@@ -42,7 +42,7 @@ export class User {
     @Prop({ type: EmailConfirmationInfo, required: true })
     emailConfirmation: EmailConfirmationInfo
 
-    @Prop({ type: PasswordRecoveryInfo, required: false })
+    @Prop({ type: PasswordRecoveryInfo, required: false, default: null })
     passwordRecovery: PasswordRecoveryInfo
 
     createdAt: Date

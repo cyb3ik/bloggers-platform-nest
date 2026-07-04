@@ -1,4 +1,6 @@
-import { LikesInfo, LikeStatus } from '../../../comments/domain/comment.entity';
+import { LikesInfo } from '../../../comments/domain/comment.entity';
+import { LikeStatus } from '../../../likes/dto/create-like-input.dto';
+import { LikeViewDto } from '../../../likes/dto/like-view.dto';
 import { PostDocument } from '../../domain/post.entity';
 
 export class PostViewDto {
@@ -9,9 +11,7 @@ export class PostViewDto {
     blogId: string
     blogName: string
     createdAt: Date
-    //@ts-ignore TODO likes
     extendedLikesInfo: LikesInfo | { myStatus: LikeStatus } | { newestLikes: LikeViewDto[] }
-    //@ts-ignore    
     constructor(post: PostDocument, likeStatus: LikeStatus = LikeStatus.None, newestLikes: LikeViewDto[] = []) {
         this.id = post._id.toString()
         this.title = post.title

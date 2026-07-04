@@ -1,12 +1,13 @@
-import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from "@nestjs/common";
+import { CanActivate, ExecutionContext, ForbiddenException, Inject, Injectable, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
-import { UsersService } from "../../modules/users/application/users.service";
 import { UsersRepository } from "../../modules/users/infrastructure/users.repository";
+import { ACCESS_TOKEN_STRATEGY_INJECT_TOKEN } from "../constants/jwt-tokens";
 
 @Injectable()
 export class AccessTokenAuthGuard implements CanActivate {
 
     constructor(
+        @Inject(ACCESS_TOKEN_STRATEGY_INJECT_TOKEN)
         private readonly JwtService: JwtService,
         private readonly UsersRepository: UsersRepository
     ) { }
@@ -22,13 +23,23 @@ export class AccessTokenAuthGuard implements CanActivate {
             }
 
             const [authType, token] = authHeader.split(' ')
+
             if (authType !== 'Bearer') {
                 throw new UnauthorizedException()
             }
 
             const payload = await this.JwtService.verify(token)
 
-            req.user = await this.UsersRepository.findUserByIdOrFail(payload.id)
+            const user = await this.UsersRepository.findUserById(payload.id)
+
+            if (!user) {
+                throw new UnauthorizedException()
+            }
+
+            req.user = {
+                id: user._id,
+                login: user.login
+            }
 
             return true
         } catch (e) {
