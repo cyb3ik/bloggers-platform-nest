@@ -4,7 +4,7 @@ import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { HttpExceptionFilter } from './core/exception-filters/http.exception.filter';
 import { ObjectIdValidationPipe } from './core/pipes/object-id-validation.pipe';
 
-async function bootstrap() {
+export async function bootstrap() {
   const app = await NestFactory.create(AppModule)
 
   app.setGlobalPrefix('bloggers-platform/api')
