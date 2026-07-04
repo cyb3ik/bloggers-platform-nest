@@ -4,7 +4,7 @@ import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { HttpExceptionFilter } from './core/exception-filters/http.exception.filter';
 import { ObjectIdValidationPipe } from './core/pipes/object-id-validation.pipe';
 
-export async function bootstrap() {
+async function bootstrap() {
   const app = await NestFactory.create(AppModule)
 
   app.setGlobalPrefix('bloggers-platform/api')
@@ -33,4 +33,4 @@ export async function bootstrap() {
   await app.listen(process.env.PORT ?? 5002)
 }
 
-bootstrap()
+export default bootstrap()
