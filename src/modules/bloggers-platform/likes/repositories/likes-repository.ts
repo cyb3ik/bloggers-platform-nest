@@ -1,9 +1,9 @@
 import { Injectable } from "@nestjs/common"
 import { InjectModel } from "@nestjs/mongoose"
 import { Like, LikeDocument, type LikeModelType } from "../domain/like.entity"
-import { LikeStatus } from "../dto/create-like-input.dto"
 import { Types } from "mongoose"
 import { LikeViewDto } from "../dto/like-view.dto"
+import { LikeStatus } from "../dto/create-domain-like.dto"
 
 @Injectable()
 export class LikesRepository {
@@ -17,7 +17,7 @@ export class LikesRepository {
         like.softDeleteSelf()
     }
 
-    async getUserLikeStatus(entityId: Types.ObjectId, userId: Types.ObjectId) {
+    async getUserLikeEntityAndStatus(entityId: Types.ObjectId, userId: Types.ObjectId) {
         const result = await this.LikeModel.findOne(
             {
                 entityId: entityId,
@@ -26,10 +26,16 @@ export class LikesRepository {
         )
 
         if (!result) {
-            return LikeStatus.None
+            return {
+                status: LikeStatus.None,
+                like: null
+            }
         }
 
-        return result.status
+        return {
+            status: result.status,
+            like: result
+        }
     }
 
 

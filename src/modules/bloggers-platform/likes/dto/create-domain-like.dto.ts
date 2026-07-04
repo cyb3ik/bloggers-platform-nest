@@ -1,6 +1,6 @@
 import { Types } from "mongoose"
 
-export class CreateLikeInputDto {
+export class CreateDomainLikeDto {
     userId: Types.ObjectId
     entityId: Types.ObjectId
     userLogin: string

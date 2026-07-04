@@ -6,11 +6,13 @@ import { NotFoundException } from '@nestjs/common';
 import { CommentsQueryRepository } from '../../../../comments/infrastructure/comments.query.repository';
 import { CommentViewDto } from '../../../../comments/api/dto/comments.view-dto';
 import { CommentsQueryParams } from '../../../../comments/api/dto/comments.query.params-dto';
+import { LikesRepository } from '../../../../likes/repositories/likes-repository';
 
 export class FindAllCommentsFromPostQuery extends Query<PaginatedViewDto<CommentViewDto[]>> {
     constructor(
         public readonly postId: Types.ObjectId,
-        public readonly query: CommentsQueryParams
+        public readonly query: CommentsQueryParams,
+        public readonly userId?: Types.ObjectId,
     ) {
         super()
     }
@@ -21,6 +23,7 @@ export class FindAllCommentsFromPostQueryHandler implements IQueryHandler<FindAl
     constructor(
         private readonly PostsQueryRepository: PostsQueryRepository,
         private readonly CommentsQueryRepository: CommentsQueryRepository,
+        private readonly LikesRepository: LikesRepository,
     ) { }
 
     async execute(query: FindAllCommentsFromPostQuery): Promise<PaginatedViewDto<CommentViewDto[]>> {
@@ -30,8 +33,21 @@ export class FindAllCommentsFromPostQueryHandler implements IQueryHandler<FindAl
             throw new NotFoundException('Post not found')
         }
 
-        const comments = await this.CommentsQueryRepository.findAllCommentsFromPost(query.postId, query.query)
+        const { items, totalCount } = await this.CommentsQueryRepository.findAllCommentsFromPost(query.postId, query.query)
 
-        return comments
+        const itemsWithStatuses = []
+
+        for (const item of items) {
+            const { status } = await this.LikesRepository.getUserLikeEntityAndStatus(item._id, query.userId)
+
+            itemsWithStatuses.push(new CommentViewDto(item, status))
+        }
+
+        return PaginatedViewDto.mapToView({
+            items: itemsWithStatuses,
+            page: query.query.pageNumber,
+            size: query.query.pageSize,
+            totalCount: totalCount
+        })
     }
 }

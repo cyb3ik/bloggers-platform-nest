@@ -1,18 +1,18 @@
 import { InjectModel } from "@nestjs/mongoose";
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
 import { Types } from "mongoose";
-import { CreatePostForBlogInputDto } from "../../../../posts/api/dto/posts.input-dto";
 import { PostsRepository } from "../../../../posts/infrastructure/posts.repository";
 import { NotFoundException } from "@nestjs/common";
 import { Comment, type CommentModelType } from "../../../../comments/domain/comment.entity";
 import { CommentsRepository } from "../../../../comments/infrastructure/comments.repository";
 import { CreateCommentInputDto } from "../../../../comments/api/dto/comments.input-dto";
+import { UserInfo } from "../../../../../users/api/dto/user-info.dto";
 
 
 export class CreateCommentForPostCommand {
     constructor(
         public readonly postId: Types.ObjectId,
-        public readonly user: { id: string, login: string },
+        public readonly user: UserInfo,
         public readonly dto: CreateCommentInputDto
     ) { }
 }
@@ -38,7 +38,7 @@ export class CreateCommentForPostUseCase
         const comment = this.CommentModel.createInstance({
             content: dto.content,
             commentatorInfo: {
-                userId: user.id,
+                userId: user.id.toString(),
                 userLogin: user.login
             },
             postId: postId.toString()

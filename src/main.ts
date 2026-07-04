@@ -13,7 +13,6 @@ async function bootstrap() {
       transform: true,
       whitelist: true,
       stopAtFirstError: true,
-      forbidNonWhitelisted: true,
 
       exceptionFactory: (errors) => {
         const errorsRes = errors.map(e => {

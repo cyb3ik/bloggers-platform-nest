@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { HydratedDocument, Model, Types } from "mongoose";
-import { CreateLikeInputDto, LikeStatus } from "../dto/create-like-input.dto";
+import { CreateDomainLikeDto, LikeStatus } from "../dto/create-domain-like.dto";
 
 @Schema({ timestamps: true })
 export class Like {
@@ -22,7 +22,7 @@ export class Like {
     @Prop({ type: Date, nullable: true, default: null })
     deletedAt: Date | null
 
-    static createInstance(dto: CreateLikeInputDto): LikeDocument {
+    static createInstance(dto: CreateDomainLikeDto): LikeDocument {
         const like = new this()
         like.userId = dto.userId
         like.entityId = dto.entityId

@@ -1,9 +1,7 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-import type { PostModelType } from "../domain/post.entity";
-import { PaginatedViewDto } from "../../../../core/dto/paginated.view-dto";
+import type { PostDocument, PostModelType } from "../domain/post.entity";
 import { Post } from "../domain/post.entity";
-import { PostViewDto } from "../api/dto/posts.view-dto";
 import { PostsQueryParams } from "../api/dto/posts.query.params-dto";
 import { Types } from "mongoose";
 
@@ -12,22 +10,18 @@ import { Types } from "mongoose";
 export class PostsQueryRepository {
     constructor(@InjectModel(Post.name) private readonly PostModel: PostModelType) { }
 
-    async findPostById(id: Types.ObjectId): Promise<PostViewDto | null> {
+    async findPostById(id: Types.ObjectId): Promise<PostDocument | null> {
         const post = await this.PostModel.findOne({
             _id: id,
             deletedAt: null,
         })
 
-        if (!post) {
-            return null
-        }
-
-        return new PostViewDto(post)
+        return post
     }
 
-    async findAllPosts(query: PostsQueryParams): Promise<PaginatedViewDto<PostViewDto[]>> {
+    async findAllPosts(query: PostsQueryParams) {
 
-        const { pageNumber, pageSize, sortBy, sortDirection } = query
+        const { pageSize, sortBy, sortDirection } = query
 
         const skip = query.calculateSkip()
 
@@ -42,17 +36,12 @@ export class PostsQueryRepository {
 
         const totalCount = await this.PostModel.countDocuments(filter)
 
-        return PaginatedViewDto.mapToView({
-            items: result.map(post => new PostViewDto(post)),
-            page: pageNumber,
-            size: pageSize,
-            totalCount: totalCount
-        })
+        return { items: result, totalCount: totalCount }
     }
 
-    async findAllPostsFromBlog(blogId: Types.ObjectId, query: PostsQueryParams): Promise<PaginatedViewDto<PostViewDto[]>> {
+    async findAllPostsFromBlog(blogId: Types.ObjectId, query: PostsQueryParams) {
 
-        const { pageNumber, pageSize, sortBy, sortDirection } = query
+        const { pageSize, sortBy, sortDirection } = query
 
         const skip = query.calculateSkip()
 
@@ -67,11 +56,6 @@ export class PostsQueryRepository {
 
         const totalCount = await this.PostModel.countDocuments(filter)
 
-        return PaginatedViewDto.mapToView({
-            items: result.map(post => new PostViewDto(post)),
-            page: pageNumber,
-            size: pageSize,
-            totalCount: totalCount
-        })
+        return { items: result, totalCount: totalCount }
     }
 }

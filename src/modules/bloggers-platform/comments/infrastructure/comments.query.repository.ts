@@ -19,9 +19,9 @@ export class CommentsQueryRepository {
         return comment
     }
 
-    async findAllCommentsFromPost(postId: Types.ObjectId, query: CommentsQueryParams): Promise<PaginatedViewDto<CommentViewDto[]>> {
+    async findAllCommentsFromPost(postId: Types.ObjectId, query: CommentsQueryParams) {
 
-        const { pageNumber, pageSize, sortBy, sortDirection } = query
+        const { pageSize, sortBy, sortDirection } = query
 
         const skip = query.calculateSkip()
 
@@ -36,11 +36,6 @@ export class CommentsQueryRepository {
 
         const totalCount = await this.CommentModel.countDocuments(filter)
 
-        return PaginatedViewDto.mapToView({
-            items: result.map(comment => new CommentViewDto(comment)),
-            page: pageNumber,
-            size: pageSize,
-            totalCount: totalCount
-        })
+        return { items: result, totalCount: totalCount }
     }
 }

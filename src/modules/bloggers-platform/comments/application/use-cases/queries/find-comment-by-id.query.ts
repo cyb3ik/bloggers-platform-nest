@@ -5,7 +5,7 @@ import { NotFoundException } from '@nestjs/common';
 import { CommentsQueryRepository } from '../../../infrastructure/comments.query.repository';
 import { CommentViewDto } from '../../../api/dto/comments.view-dto';
 import { LikesRepository } from '../../../../likes/repositories/likes-repository';
-import { LikeStatus } from '../../../../likes/dto/create-like-input.dto';
+import { LikeStatus } from '../../../../likes/dto/create-domain-like.dto';
 
 export class FindCommentByIdQuery extends Query<CommentViewDto> {
     constructor(
@@ -36,8 +36,8 @@ export class FindCommentByIdQueryHandler implements IQueryHandler<FindCommentByI
             return new CommentViewDto(comment, LikeStatus.None)
         }
 
-        const likeStatus = await this.LikesRepository.getUserLikeStatus(query.commentId, query.userId)
+        const { status } = await this.LikesRepository.getUserLikeEntityAndStatus(query.commentId, query.userId)
 
-        return new CommentViewDto(comment, likeStatus)
+        return new CommentViewDto(comment, status)
     }
 }

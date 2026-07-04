@@ -10,6 +10,10 @@ import { DeleteCommentCommand } from "../application/use-cases/commands/delete-c
 import { AccessTokenAuthGuard } from "../../../../core/guards/access-token.auth.guard";
 import { ExtractUserFromRequest } from "../../../../core/decorators/extract-user.decorator";
 import { UserInfo } from "../../../users/api/dto/user-info.dto";
+import { OptionalAccessTokenAuthGuard } from "../../../../core/guards/optional-access-token.auth.guard";
+import { CheckGuestStatus } from "../../../../core/decorators/check-guest-status.decorator";
+import { ChangeLikeStatusInputDto } from "../../likes/dto/change-like-status-input.dto";
+import { ChangeLikeStatusOnCommentCommand } from "../application/use-cases/commands/change-like-status-on-comment.usecase";
 
 @Controller('comments')
 export class CommentsController {
@@ -19,23 +23,42 @@ export class CommentsController {
     ) { }
 
     @Get('id')
-    @UseGuards(AccessTokenAuthGuard)
+    @UseGuards(OptionalAccessTokenAuthGuard)
     @HttpCode(HttpStatus.OK)
     async findCommentById(
-        @ExtractUserFromRequest() user: UserInfo,
+        @CheckGuestStatus() user: UserInfo | null,
         @Param('id') id: Types.ObjectId
     ) {
 
-        return this.QueryBus.execute(new FindCommentByIdQuery(id, user.id))
+        if (user) {
+            return this.QueryBus.execute(new FindCommentByIdQuery(id, user.id))
+        }
+
+        return this.QueryBus.execute(new FindCommentByIdQuery(id))
+    }
+
+    @Put(':commentId/like-status')
+    @UseGuards(AccessTokenAuthGuard)
+    @HttpCode(HttpStatus.NO_CONTENT)
+    async changeLikeStatus(
+        @ExtractUserFromRequest() user: UserInfo,
+        @Param('commentId') commentId: Types.ObjectId,
+        @Body() dto: ChangeLikeStatusInputDto
+    ) {
+
+        return this.CommandBus.execute(new ChangeLikeStatusOnCommentCommand(commentId, user, dto))
     }
 
     @Put('id')
+    @UseGuards(AccessTokenAuthGuard)
     @HttpCode(HttpStatus.NO_CONTENT)
     async updateCommentById(
+        @ExtractUserFromRequest() user: UserInfo,
         @Param('id') id: Types.ObjectId,
-        @Body() dto: UpdateCommentInputDto) {
+        @Body() dto: UpdateCommentInputDto
+    ) {
 
-        return this.CommandBus.execute(new UpdateCommentCommand(id, dto))
+        return this.CommandBus.execute(new UpdateCommentCommand(id, dto, user.id))
     }
 
     @Delete('id')

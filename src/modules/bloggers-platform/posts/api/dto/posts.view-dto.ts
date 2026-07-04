@@ -1,5 +1,5 @@
 import { LikesInfo } from '../../../comments/domain/comment.entity';
-import { LikeStatus } from '../../../likes/dto/create-like-input.dto';
+import { LikeStatus } from '../../../likes/dto/create-domain-like.dto';
 import { LikeViewDto } from '../../../likes/dto/like-view.dto';
 import { PostDocument } from '../../domain/post.entity';
 

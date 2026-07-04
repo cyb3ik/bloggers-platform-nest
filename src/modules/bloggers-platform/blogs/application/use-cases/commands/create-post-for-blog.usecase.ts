@@ -2,7 +2,7 @@ import { InjectModel } from "@nestjs/mongoose";
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
 import { Types } from "mongoose";
 import { BlogsRepository } from "../../../infrastructure/blogs.repository";
-import { CreatePostInputDto } from "../../../../posts/api/dto/posts.input-dto";
+import { CreatePostForBlogInputDto, CreatePostInputDto } from "../../../../posts/api/dto/posts.input-dto";
 import { Post, type PostModelType } from "../../../../posts/domain/post.entity";
 import { PostsRepository } from "../../../../posts/infrastructure/posts.repository";
 import { NotFoundException } from "@nestjs/common";
@@ -11,7 +11,7 @@ import { NotFoundException } from "@nestjs/common";
 export class CreatePostForBlogCommand {
     constructor(
         public readonly blogId: Types.ObjectId,
-        public readonly dto: CreatePostInputDto
+        public readonly dto: CreatePostInputDto | CreatePostForBlogInputDto
     ) { }
 }
 

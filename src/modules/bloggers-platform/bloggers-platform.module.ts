@@ -34,6 +34,9 @@ import { JwtService } from "@nestjs/jwt";
 import { UsersModule } from "../users/users.module";
 import { LikesRepository } from "./likes/repositories/likes-repository";
 import { Like, LikeSchema } from "./likes/domain/like.entity";
+import { FindAllPostsQueryHandler } from "./posts/application/use-cases/queries/find-all-posts.query";
+import { ChangeLikeStatusOnCommentUseCase } from "./comments/application/use-cases/commands/change-like-status-on-comment.usecase";
+import { ChangeLikeStatusOnPostUseCase } from "./posts/application/use-cases/commands/change-like-status-on-comment.usecase";
 
 const blogsCommands = [
     CreateBlogUseCase,
@@ -49,16 +52,19 @@ const blogsQueries = [
 
 const postsCommands = [
     UpdatePostUseCase,
-    DeletePostUseCase
+    DeletePostUseCase,
+    ChangeLikeStatusOnPostUseCase
 ]
 const postsQueries = [
+    FindAllPostsQueryHandler,
     FindPostByIdQueryHandler,
     FindAllCommentsFromPostQueryHandler
 ]
 
 const commentsCommands = [
     UpdateCommentUseCase,
-    DeleteCommentUseCase
+    DeleteCommentUseCase,
+    ChangeLikeStatusOnCommentUseCase
 ]
 const commentsQueries = [
     FindCommentByIdQueryHandler

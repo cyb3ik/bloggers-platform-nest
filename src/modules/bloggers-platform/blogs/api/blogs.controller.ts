@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, Query } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, Query, UseGuards } from "@nestjs/common";
 import { BlogsQueryParams } from "./dto/blogs.query.params-dto";
 import { PostsQueryParams } from "../../posts/api/dto/posts.query.params-dto";
 import { CreateBlogInputDto, UpdateBlogInputDto } from "./dto/blogs.input-dto";
@@ -17,6 +17,10 @@ import { CreatePostForBlogCommand } from "../application/use-cases/commands/crea
 import { FindPostByIdQuery } from "../../posts/application/use-cases/queries/find-post-by-id.query";
 import { UpdateBlogCommand } from "../application/use-cases/commands/update-blog.usecase";
 import { DeleteBlogCommand } from "../application/use-cases/commands/delete-blog.usecase";
+import { BasicAuthGuard } from "../../../../core/guards/basic.auth.guard";
+import { OptionalAccessTokenAuthGuard } from "../../../../core/guards/optional-access-token.auth.guard";
+import { CheckGuestStatus } from "../../../../core/decorators/check-guest-status.decorator";
+import { UserInfo } from "../../../users/api/dto/user-info.dto";
 
 @Controller('blogs')
 export class BlogsController {
@@ -40,15 +44,22 @@ export class BlogsController {
     }
 
     @Get(':blogId/posts')
+    @UseGuards(OptionalAccessTokenAuthGuard)
     @HttpCode(HttpStatus.OK)
     async findAllPostsFromBlog(
+        @CheckGuestStatus() user: UserInfo | null,
         @Param('blogId') blogId: Types.ObjectId,
         @Query() query: PostsQueryParams) {
+
+        if (user) {
+            return this.QueryBus.execute(new FindAllPostsFromBlogQuery(blogId, query, user.id))
+        }
 
         return this.QueryBus.execute(new FindAllPostsFromBlogQuery(blogId, query))
     }
 
     @Post()
+    @UseGuards(BasicAuthGuard)
     @HttpCode(HttpStatus.CREATED)
     async createBlog(@Body() dto: CreateBlogInputDto) {
 
@@ -58,10 +69,11 @@ export class BlogsController {
     }
 
     @Post(':blogId/posts')
+    @UseGuards(BasicAuthGuard)
     @HttpCode(HttpStatus.CREATED)
     async createPostForBlog(
         @Param('blogId') blogId: Types.ObjectId,
-        @Body() dto: CreatePostInputDto) {
+        @Body() dto: CreatePostForBlogInputDto) {
 
         const createdPostId = await this.CommandBus.execute(new CreatePostForBlogCommand(blogId, dto))
 
@@ -69,6 +81,7 @@ export class BlogsController {
     }
 
     @Put(':id')
+    @UseGuards(BasicAuthGuard)
     @HttpCode(HttpStatus.NO_CONTENT)
     async updateBlogById(
         @Param('id') id: Types.ObjectId,
@@ -78,6 +91,7 @@ export class BlogsController {
     }
 
     @Delete(':id')
+    @UseGuards(BasicAuthGuard)
     @HttpCode(HttpStatus.NO_CONTENT)
     async deleteBlogById(@Param('id') id: Types.ObjectId) {
 
