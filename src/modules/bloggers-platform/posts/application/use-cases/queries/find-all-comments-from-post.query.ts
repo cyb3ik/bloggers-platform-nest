@@ -38,7 +38,7 @@ export class FindAllCommentsFromPostQueryHandler implements IQueryHandler<FindAl
 
         const itemsWithStatuses = []
 
-        if (query.userId.toString()) {
+        if (query.userId) {
             for (const item of items) {
                 const { status } = await this.LikesRepository.getUserLikeEntityAndStatus(item._id, query.userId)
 
