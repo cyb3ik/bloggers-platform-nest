@@ -43,8 +43,8 @@ export class LikesRepository {
         const items = await this.LikeModel
             .find(
                 {
-                    entityId: entityId,
-                    status: LikeStatus.Like
+                    entityId: entityId.toString(),
+                    status: "Like"
                 }
             )
             .sort({ createdAt: -1 })

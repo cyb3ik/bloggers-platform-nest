@@ -1,10 +1,12 @@
-import { IQueryHandler, Query, QueryHandler } from '@nestjs/cqrs';
+import { IQueryHandler, Query, QueryBus, QueryHandler } from '@nestjs/cqrs';
 import { PaginatedViewDto } from '../../../../../../core/dto/paginated.view-dto';
 import { PostViewDto } from '../../../api/dto/posts.view-dto';
 import { PostsQueryParams } from '../../../api/dto/posts.query.params-dto';
 import { PostsQueryRepository } from '../../../infrastructure/posts.query.repository';
 import { Types } from 'mongoose';
 import { LikesRepository } from '../../../../likes/repositories/likes-repository';
+import { LikeStatus } from '../../../../likes/dto/create-domain-like.dto';
+import { FindPostByIdQuery } from './find-post-by-id.query';
 
 export class FindAllPostsQuery extends Query<PaginatedViewDto<PostViewDto[]>> {
     constructor(
@@ -19,7 +21,7 @@ export class FindAllPostsQuery extends Query<PaginatedViewDto<PostViewDto[]>> {
 export class FindAllPostsQueryHandler implements IQueryHandler<FindAllPostsQuery> {
     constructor(
         private readonly PostsQueryRepository: PostsQueryRepository,
-        private readonly LikesRepository: LikesRepository
+        private readonly LikesRepository: LikesRepository,
     ) { }
 
     async execute(query: FindAllPostsQuery): Promise<PaginatedViewDto<PostViewDto[]>> {
@@ -27,12 +29,21 @@ export class FindAllPostsQueryHandler implements IQueryHandler<FindAllPostsQuery
 
         const itemsWithStatuses = []
 
-        for (const item of items) {
-            const { status } = await this.LikesRepository.getUserLikeEntityAndStatus(item._id, query.userId)
+        if (!query.userId) {
+            for (const item of items) {
 
-            const newestLikes = await this.LikesRepository.getNewestLikesFromEntity(item._id)
+                const newestLikes = await this.LikesRepository.getNewestLikesFromEntity(item._id)
 
-            itemsWithStatuses.push(new PostViewDto(item, status, newestLikes))
+                itemsWithStatuses.push(new PostViewDto(item, LikeStatus.None, newestLikes))
+            }
+        } else {
+            for (const item of items) {
+                const { status } = await this.LikesRepository.getUserLikeEntityAndStatus(item._id, query.userId)
+
+                const newestLikes = await this.LikesRepository.getNewestLikesFromEntity(item._id)
+
+                itemsWithStatuses.push(new PostViewDto(item, status, newestLikes))
+            }
         }
 
         return PaginatedViewDto.mapToView({

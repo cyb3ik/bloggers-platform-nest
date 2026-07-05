@@ -7,6 +7,7 @@ import { CommentsQueryRepository } from '../../../../comments/infrastructure/com
 import { CommentViewDto } from '../../../../comments/api/dto/comments.view-dto';
 import { CommentsQueryParams } from '../../../../comments/api/dto/comments.query.params-dto';
 import { LikesRepository } from '../../../../likes/repositories/likes-repository';
+import { LikeStatus } from '../../../../likes/dto/create-domain-like.dto';
 
 export class FindAllCommentsFromPostQuery extends Query<PaginatedViewDto<CommentViewDto[]>> {
     constructor(
@@ -37,11 +38,20 @@ export class FindAllCommentsFromPostQueryHandler implements IQueryHandler<FindAl
 
         const itemsWithStatuses = []
 
-        for (const item of items) {
-            const { status } = await this.LikesRepository.getUserLikeEntityAndStatus(item._id, query.userId)
+        if (!query.userId) {
+            for (const item of items) {
 
-            itemsWithStatuses.push(new CommentViewDto(item, status))
+                itemsWithStatuses.push(new CommentViewDto(item, LikeStatus.None))
+            }
+        } else {
+            for (const item of items) {
+
+                const { status } = await this.LikesRepository.getUserLikeEntityAndStatus(item._id, query.userId)
+
+                itemsWithStatuses.push(new CommentViewDto(item, status))
+            }
         }
+
 
         return PaginatedViewDto.mapToView({
             items: itemsWithStatuses,
