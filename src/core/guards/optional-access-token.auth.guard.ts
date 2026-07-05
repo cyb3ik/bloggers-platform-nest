@@ -26,7 +26,8 @@ export class OptionalAccessTokenAuthGuard implements CanActivate {
             const [authType, token] = authHeader.split(' ')
 
             if (authType !== 'Bearer') {
-                throw new UnauthorizedException()
+                req.user = null
+                return true
             }
 
             const payload = await this.JwtService.verify(token)
