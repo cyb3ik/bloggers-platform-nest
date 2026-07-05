@@ -6,7 +6,6 @@ import { PostsQueryRepository } from '../../../infrastructure/posts.query.reposi
 import { Types } from 'mongoose';
 import { LikesRepository } from '../../../../likes/repositories/likes-repository';
 import { LikeStatus } from '../../../../likes/dto/create-domain-like.dto';
-import { FindPostByIdQuery } from './find-post-by-id.query';
 
 export class FindAllPostsQuery extends Query<PaginatedViewDto<PostViewDto[]>> {
     constructor(
