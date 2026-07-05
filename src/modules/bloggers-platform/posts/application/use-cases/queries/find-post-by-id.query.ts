@@ -32,8 +32,6 @@ export class FindPostByIdQueryHandler implements IQueryHandler<FindPostByIdQuery
             throw new NotFoundException('Post not found')
         }
 
-        console.log(query.postId)
-
         const newestLikes = await this.LikesRepository.getNewestLikesFromEntity(query.postId)
 
         if (!query.userId) {

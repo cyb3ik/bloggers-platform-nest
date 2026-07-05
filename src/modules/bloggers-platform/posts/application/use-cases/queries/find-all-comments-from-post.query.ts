@@ -38,17 +38,16 @@ export class FindAllCommentsFromPostQueryHandler implements IQueryHandler<FindAl
 
         const itemsWithStatuses = []
 
-        if (!query.userId) {
+        if (query.userId) {
             for (const item of items) {
-
-                itemsWithStatuses.push(new CommentViewDto(item, LikeStatus.None))
-            }
-        } else {
-            for (const item of items) {
-
                 const { status } = await this.LikesRepository.getUserLikeEntityAndStatus(item._id, query.userId)
 
                 itemsWithStatuses.push(new CommentViewDto(item, status))
+
+            }
+        } else {
+            for (const item of items) {
+                itemsWithStatuses.push(new CommentViewDto(item, LikeStatus.None))
             }
         }
 

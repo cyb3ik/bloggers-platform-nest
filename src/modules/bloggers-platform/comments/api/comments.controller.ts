@@ -60,9 +60,13 @@ export class CommentsController {
     }
 
     @Delete(':id')
+    @UseGuards(AccessTokenAuthGuard)
     @HttpCode(HttpStatus.NO_CONTENT)
-    async deleteCommentById(@Param('id') id: Types.ObjectId) {
+    async deleteCommentById(
+        @ExtractUserFromRequest() user: UserInfo,
+        @Param('id') id: Types.ObjectId
+    ) {
 
-        return this.CommandBus.execute(new DeleteCommentCommand(id))
+        return this.CommandBus.execute(new DeleteCommentCommand(id, user.id))
     }
 }

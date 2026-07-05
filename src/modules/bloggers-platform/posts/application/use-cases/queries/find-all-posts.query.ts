@@ -29,20 +29,20 @@ export class FindAllPostsQueryHandler implements IQueryHandler<FindAllPostsQuery
 
         const itemsWithStatuses = []
 
-        if (!query.userId) {
-            for (const item of items) {
-
-                const newestLikes = await this.LikesRepository.getNewestLikesFromEntity(item._id)
-
-                itemsWithStatuses.push(new PostViewDto(item, LikeStatus.None, newestLikes))
-            }
-        } else {
+        if (query.userId) {
             for (const item of items) {
                 const { status } = await this.LikesRepository.getUserLikeEntityAndStatus(item._id, query.userId)
 
                 const newestLikes = await this.LikesRepository.getNewestLikesFromEntity(item._id)
 
                 itemsWithStatuses.push(new PostViewDto(item, status, newestLikes))
+
+            }
+        } else {
+            for (const item of items) {
+                const newestLikes = await this.LikesRepository.getNewestLikesFromEntity(item._id)
+
+                itemsWithStatuses.push(new PostViewDto(item, LikeStatus.None, newestLikes))
             }
         }
 
