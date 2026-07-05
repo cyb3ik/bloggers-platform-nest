@@ -4,6 +4,7 @@ import { User, type UserModelType } from "../users/domain/user.entity";
 import { Blog, type BlogModelType } from "../bloggers-platform/blogs/domain/blog.entity";
 import { Post, type PostModelType } from "../bloggers-platform/posts/domain/post.entity";
 import { Comment, type CommentModelType } from "../bloggers-platform/comments/domain/comment.entity";
+import { Like, type LikeModelType } from "../bloggers-platform/likes/domain/like.entity";
 
 @Injectable()
 export class TestingService {
@@ -16,6 +17,8 @@ export class TestingService {
         private readonly PostModel: PostModelType,
         @InjectModel(Comment.name)
         private readonly CommentModel: CommentModelType,
+        @InjectModel(Like.name)
+        private readonly LikeModel: LikeModelType,
 
     ) { }
 
@@ -24,5 +27,6 @@ export class TestingService {
         await this.BlogModel.deleteMany({})
         await this.PostModel.deleteMany({})
         await this.CommentModel.deleteMany({})
+        await this.LikeModel.deleteMany({})
     }
 }
