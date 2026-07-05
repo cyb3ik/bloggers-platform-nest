@@ -29,7 +29,7 @@ export class FindAllPostsQueryHandler implements IQueryHandler<FindAllPostsQuery
 
         const itemsWithStatuses = []
 
-        if (query.userId) {
+        if (query.userId.toString()) {
             for (const item of items) {
                 const { status } = await this.LikesRepository.getUserLikeEntityAndStatus(item._id, query.userId)
 

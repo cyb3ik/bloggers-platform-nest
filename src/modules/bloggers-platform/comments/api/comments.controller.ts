@@ -27,7 +27,7 @@ export class CommentsController {
         @CheckGuestStatus() user: UserInfo | null,
         @Param('id') id: Types.ObjectId
     ) {
-        console.log(134)
+
         if (user) {
             return this.QueryBus.execute(new FindCommentByIdQuery(id, user.id))
         }
