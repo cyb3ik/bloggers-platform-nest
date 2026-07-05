@@ -20,8 +20,8 @@ export class LikesRepository {
     async getUserLikeEntityAndStatus(entityId: Types.ObjectId, userId: Types.ObjectId) {
         const result = await this.LikeModel.findOne(
             {
-                entityId: entityId.toString(),
-                userId: userId.toString()
+                entityId: entityId,
+                userId: userId
             }
         )
 
