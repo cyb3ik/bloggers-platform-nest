@@ -36,8 +36,8 @@ import { LikesRepository } from "./likes/repositories/likes-repository";
 import { Like, LikeSchema } from "./likes/domain/like.entity";
 import { FindAllPostsQueryHandler } from "./posts/application/use-cases/queries/find-all-posts.query";
 import { ChangeLikeStatusOnCommentUseCase } from "./comments/application/use-cases/commands/change-like-status-on-comment.usecase";
-import { ChangeLikeStatusOnPostUseCase } from "./posts/application/use-cases/commands/change-like-status-on-comment.usecase";
 import { CreateCommentForPostUseCase } from "./posts/application/use-cases/commands/create-comment-for-post.usecase";
+import { ChangeLikeStatusOnPostUseCase } from "./posts/application/use-cases/commands/change-like-status-on-post.usecase";
 
 const blogsCommands = [
     CreateBlogUseCase,

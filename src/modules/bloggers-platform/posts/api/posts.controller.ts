@@ -18,9 +18,9 @@ import { DeletePostCommand } from "../application/use-cases/commands/delete-post
 import { BasicAuthGuard } from "../../../../core/guards/basic.auth.guard";
 import { UserInfo } from "../../../users/api/dto/user-info.dto";
 import { ChangeLikeStatusInputDto } from "../../likes/dto/change-like-status-input.dto";
-import { ChangeLikeStatusOnPostCommand } from "../application/use-cases/commands/change-like-status-on-comment.usecase";
 import { OptionalAccessTokenAuthGuard } from "../../../../core/guards/optional-access-token.auth.guard";
 import { CheckGuestStatus } from "../../../../core/decorators/check-guest-status.decorator";
+import { ChangeLikeStatusOnPostCommand } from "../application/use-cases/commands/change-like-status-on-post.usecase";
 
 
 @Controller('posts')

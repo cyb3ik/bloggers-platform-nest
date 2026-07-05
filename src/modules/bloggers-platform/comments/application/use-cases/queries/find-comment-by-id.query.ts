@@ -28,6 +28,8 @@ export class FindCommentByIdQueryHandler implements IQueryHandler<FindCommentByI
             query.commentId
         )
 
+        console.log(123)
+
         if (!comment) {
             throw new NotFoundException('Comment not found')
         }

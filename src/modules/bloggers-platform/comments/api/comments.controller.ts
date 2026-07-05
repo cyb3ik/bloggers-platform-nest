@@ -1,6 +1,4 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Put, UseGuards } from "@nestjs/common";
-import { CommentsQueryRepository } from "../infrastructure/comments.query.repository";
-import { ParseObjectIdPipe } from "@nestjs/mongoose";
 import { Types } from "mongoose";
 import { CommandBus, QueryBus } from "@nestjs/cqrs";
 import { FindCommentByIdQuery } from "../application/use-cases/queries/find-comment-by-id.query";
@@ -22,14 +20,14 @@ export class CommentsController {
         private readonly QueryBus: QueryBus,
     ) { }
 
-    @Get('id')
+    @Get(':id')
     @UseGuards(OptionalAccessTokenAuthGuard)
     @HttpCode(HttpStatus.OK)
     async findCommentById(
         @CheckGuestStatus() user: UserInfo | null,
         @Param('id') id: Types.ObjectId
     ) {
-
+        console.log(134)
         if (user) {
             return this.QueryBus.execute(new FindCommentByIdQuery(id, user.id))
         }
@@ -49,7 +47,7 @@ export class CommentsController {
         return this.CommandBus.execute(new ChangeLikeStatusOnCommentCommand(commentId, user, dto))
     }
 
-    @Put('id')
+    @Put(':id')
     @UseGuards(AccessTokenAuthGuard)
     @HttpCode(HttpStatus.NO_CONTENT)
     async updateCommentById(
@@ -61,7 +59,7 @@ export class CommentsController {
         return this.CommandBus.execute(new UpdateCommentCommand(id, dto, user.id))
     }
 
-    @Delete('id')
+    @Delete(':id')
     @HttpCode(HttpStatus.NO_CONTENT)
     async deleteCommentById(@Param('id') id: Types.ObjectId) {
 
