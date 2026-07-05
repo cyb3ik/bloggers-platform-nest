@@ -14,7 +14,8 @@ export class CommentViewDto {
         this.commentatorInfo = comment.commentatorInfo
         this.createdAt = comment.createdAt
         this.likesInfo = {
-            ...comment.likesInfo,
+            likesCount: comment.likesInfo.likesCount,
+            dislikesCount: comment.likesInfo.dislikesCount,
             myStatus: likeStatus
         }
     }

@@ -5,6 +5,7 @@ export class CreatePostForBlogInputDto {
     @IsString()
     @Trim()
     @IsNotEmpty()
+    @Length(0, 30)
     title: string
 
     @IsString()

@@ -32,19 +32,19 @@ export class CreateCommentForPostUseCase
         const post = await this.PostsRepository.findPostById(postId)
 
         if (!post) {
-            throw new NotFoundException('Blog not found')
+            throw new NotFoundException('Post not found')
         }
 
         const comment = this.CommentModel.createInstance({
             content: dto.content,
             commentatorInfo: {
-                userId: user.id.toString(),
+                userId: user.id,
                 userLogin: user.login
             },
-            postId: postId.toString()
+            postId: postId
         })
 
-        await this.PostsRepository.save(post)
+        await this.CommentsRepository.save(comment)
 
         return comment._id
     }
