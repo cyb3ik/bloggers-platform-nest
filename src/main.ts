@@ -4,9 +4,7 @@ import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { HttpExceptionFilter } from './core/exception-filters/http.exception.filter';
 import { ObjectIdValidationPipe } from './core/pipes/object-id-validation.pipe';
 import { CoreConfig } from './core/core.config';
-import { SaveReqInfoGuard } from './core/guards/save-req-info.guard';
-import { RequestsRepository } from './core/requests/requests.repository';
-import { Request } from './core/requests/request.entity';
+import cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule)
@@ -35,6 +33,8 @@ async function bootstrap() {
     new ObjectIdValidationPipe())
 
   app.useGlobalFilters(new HttpExceptionFilter())
+
+  app.use(cookieParser())
 
   const port = coreConfig.port
 

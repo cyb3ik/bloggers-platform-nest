@@ -23,20 +23,20 @@ export class RefreshTokenGuard implements CanActivate {
                 throw new UnauthorizedException()
             }
 
-            const token = String(req.cookies.refreshToken)
+            const token = req.cookies.refreshToken
 
             const payload = await this.JwtService.verify(token)
 
-            const activeSession = await this.SessionsRepository.findSession(payload.userId.toString(), payload.deviceId.toString(), payload.iat!.toString())
-
-            if (!activeSession) {
-                throw new UnauthorizedException()
-            }
-
-            const user = await this.UsersRepository.findUserById(payload.userId)
+            const user = await this.UsersRepository.findUserById(payload.id)
 
             if (!user) {
                 throw new ForbiddenException()
+            }
+
+            const activeSession = await this.SessionsRepository.findSession(payload.id, payload.deviceId, Number(payload.iat))
+
+            if (!activeSession) {
+                throw new UnauthorizedException()
             }
 
             req.session = {

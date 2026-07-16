@@ -7,6 +7,8 @@ import { Blog, BlogSchema } from '../bloggers-platform/blogs/domain/blog.entity'
 import { Post, PostSchema } from '../bloggers-platform/posts/domain/post.entity';
 import { Comment, CommentSchema } from '../bloggers-platform/comments/domain/comment.entity';
 import { Like, LikeSchema } from '../bloggers-platform/likes/domain/like.entity';
+import { Session, SessionSchema } from '../sessions/session.entity';
+import { Request, RequestSchema } from '../../core/requests/request.entity';
 
 @Module({
     imports: [
@@ -15,7 +17,9 @@ import { Like, LikeSchema } from '../bloggers-platform/likes/domain/like.entity'
             { name: Blog.name, schema: BlogSchema },
             { name: Post.name, schema: PostSchema },
             { name: Comment.name, schema: CommentSchema },
-            { name: Like.name, schema: LikeSchema }])
+            { name: Like.name, schema: LikeSchema },
+            { name: Session.name, schema: SessionSchema },
+            { name: Request.name, schema: RequestSchema }])
     ],
     controllers: [TestingController],
     providers: [TestingService]

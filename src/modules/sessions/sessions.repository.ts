@@ -58,7 +58,7 @@ export class SessionsRepository {
         return
     }
 
-    async findSession(userId: string, deviceId: string, iat: string) {
+    async findSession(userId: string, deviceId: string, iat: number) {
         const activeSession = await this.SessionModel.findOne({
             userId: userId,
             deviceId: deviceId,

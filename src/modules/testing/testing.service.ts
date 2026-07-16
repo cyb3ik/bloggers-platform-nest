@@ -5,6 +5,8 @@ import { Blog, type BlogModelType } from "../bloggers-platform/blogs/domain/blog
 import { Post, type PostModelType } from "../bloggers-platform/posts/domain/post.entity";
 import { Comment, type CommentModelType } from "../bloggers-platform/comments/domain/comment.entity";
 import { Like, type LikeModelType } from "../bloggers-platform/likes/domain/like.entity";
+import { Session, type SessionModelType } from "../sessions/session.entity";
+import { Request, type RequestModelType } from "../../core/requests/request.entity";
 
 @Injectable()
 export class TestingService {
@@ -19,6 +21,10 @@ export class TestingService {
         private readonly CommentModel: CommentModelType,
         @InjectModel(Like.name)
         private readonly LikeModel: LikeModelType,
+        @InjectModel(Session.name)
+        private readonly SessionModel: SessionModelType,
+        @InjectModel(Request.name)
+        private readonly RequestModel: RequestModelType
 
     ) { }
 
@@ -28,5 +34,7 @@ export class TestingService {
         await this.PostModel.deleteMany({})
         await this.CommentModel.deleteMany({})
         await this.LikeModel.deleteMany({})
+        await this.SessionModel.deleteMany({})
+        await this.RequestModel.deleteMany({})
     }
 }
