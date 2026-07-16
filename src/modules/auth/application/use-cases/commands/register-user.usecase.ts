@@ -25,6 +25,6 @@ export class RegisterUserUseCase
 
         const user = await this.UsersRepository.findUserById(userId)
 
-        await this.AuthService.sendCodeViaEmail(user, { codeType: CodeType.emailConfirmation })
+        this.AuthService.sendCodeViaEmail(user, { codeType: CodeType.emailConfirmation }).catch(e => console.log(e))
     }
 }

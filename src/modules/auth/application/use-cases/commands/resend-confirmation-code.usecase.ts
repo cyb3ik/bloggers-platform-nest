@@ -29,6 +29,6 @@ export class ResendConfirmationCodeUseCase
             )
         }
 
-        await this.AuthService.sendCodeViaEmail(user, { codeType: CodeType.emailConfirmation })
+        this.AuthService.sendCodeViaEmail(user, { codeType: CodeType.emailConfirmation }).catch(e => console.log(e))
     }
 }
