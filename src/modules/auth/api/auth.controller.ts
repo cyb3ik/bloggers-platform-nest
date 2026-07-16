@@ -80,7 +80,7 @@ export class AuthController {
         return this.CommandBus.execute(new GenerateNewTokensCommand(sessionInfo, res))
     }
 
-    @HttpCode(HttpStatus.OK)
+    @HttpCode(HttpStatus.NO_CONTENT)
     @UseGuards(RefreshTokenGuard)
     @Post('logout')
     async logout(
