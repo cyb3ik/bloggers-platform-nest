@@ -1,7 +1,5 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Query, UseGuards } from '@nestjs/common';
-import { UsersService } from '../application/users.service';
 import { CreateUserInputDto } from './dto/users.input-dto';
-import { UsersQueryRepository } from '../infrastructure/users.query.repository';
 import { UsersQueryParams } from './dto/users.query.params-dto';
 import { BasicAuthGuard } from '../../../core/guards/basic.auth.guard';
 import { Types } from 'mongoose';

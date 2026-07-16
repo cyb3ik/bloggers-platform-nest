@@ -6,6 +6,7 @@ import { User, type UserModelType } from "../../../domain/user.entity";
 import { UsersService } from "../../users.service";
 import { UsersRepository } from "../../../infrastructure/users.repository";
 import { BcryptService } from "../../bcrypt.service";
+import { UsersConfig } from "../../../users.config";
 
 
 export class CreateUserCommand {
@@ -21,6 +22,7 @@ export class CreateUserUseCase
         private readonly UsersService: UsersService,
         private readonly UsersRepository: UsersRepository,
         private readonly CryptoService: BcryptService,
+        private readonly UsersConfig: UsersConfig
     ) { }
 
     async execute({ dto }: CreateUserCommand): Promise<Types.ObjectId> {
@@ -36,8 +38,8 @@ export class CreateUserUseCase
             passwordSalt: passwordSalt,
             passwordHash: passwordHash
         })
-        //TODO change behaviour based on current role - admin or user
-        //user.setEmailConfirmationStatus(true)
+
+        user.setEmailConfirmationStatus(this.UsersConfig.isUserAutoConfirmed)
 
         await this.UsersRepository.save(user)
 

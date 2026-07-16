@@ -2,6 +2,7 @@ import { CanActivate, ExecutionContext, ForbiddenException, Inject, Injectable, 
 import { JwtService } from "@nestjs/jwt";
 import { UsersRepository } from "../../modules/users/infrastructure/users.repository";
 import { REFRESH_TOKEN_STRATEGY_INJECT_TOKEN } from "../constants/jwt-tokens";
+import { SessionsRepository } from "../../modules/sessions/sessions.repository";
 
 @Injectable()
 export class RefreshTokenGuard implements CanActivate {
@@ -9,7 +10,8 @@ export class RefreshTokenGuard implements CanActivate {
     constructor(
         @Inject(REFRESH_TOKEN_STRATEGY_INJECT_TOKEN)
         private readonly JwtService: JwtService,
-        private readonly UsersRepository: UsersRepository
+        private readonly UsersRepository: UsersRepository,
+        private readonly SessionsRepository: SessionsRepository
     ) { }
 
     async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -25,15 +27,21 @@ export class RefreshTokenGuard implements CanActivate {
 
             const payload = await this.JwtService.verify(token)
 
+            const activeSession = await this.SessionsRepository.findSession(payload.userId.toString(), payload.deviceId.toString(), payload.iat!.toString())
+
+            if (!activeSession) {
+                throw new UnauthorizedException()
+            }
+
             const user = await this.UsersRepository.findUserById(payload.userId)
 
             if (!user) {
                 throw new ForbiddenException()
             }
 
-            req.user = {
-                id: user._id.toString(),
-                login: user.login
+            req.session = {
+                userId: user._id.toString(),
+                deviceId: payload.deviceId
             }
 
             return true

@@ -24,11 +24,24 @@ import { MailService } from '../auth/application/mail.service';
 import { AuthController } from '../auth/api/auth.controller';
 import { AuthService } from '../auth/application/auth.service';
 import { ACCESS_TOKEN_STRATEGY_INJECT_TOKEN, REFRESH_TOKEN_STRATEGY_INJECT_TOKEN } from '../../core/constants/jwt-tokens';
+import { CoreConfig } from '../../core/core.config';
+import { UsersConfig } from './users.config';
+import { Request, RequestSchema } from '../../core/requests/request.entity';
+import { RequestsRepository } from '../../core/requests/requests.repository';
+import { SessionsRepository } from '../sessions/sessions.repository';
+import { Session, SessionSchema } from '../sessions/session.entity';
+import { GenerateNewTokensUseCase } from '../auth/application/use-cases/commands/generate-new-tokens.usecase';
+import { LogoutUseCase } from '../auth/application/use-cases/commands/logout.usecase';
+import { SecurityDevicesController } from '../sessions/api/security-devices.controller';
+import { FindAllUserSessionsQueryHandler } from '../sessions/use-cases/queries/find-all-user-sessions.query';
+import { DeleteAllSessionExceptCurrentUseCase } from '../sessions/use-cases/commands/delete-all-sessions-except-current.usecase';
+import { DeleteSpecifiedSessionUseCase } from '../sessions/use-cases/commands/delete-specified-session.usecase';
 
 const queryHandlers = [
   FindUserByIdQueryHandler,
   FindAllUsersQueryHandler,
-  GetMePageQueryHandler
+  GetMePageQueryHandler,
+  FindAllUserSessionsQueryHandler
 ]
 const commandHandlers = [
   CreateUserUseCase,
@@ -38,16 +51,24 @@ const commandHandlers = [
   ConfirmUserEmailUseCase,
   ResendConfirmationCodeUseCase,
   ChangeUserPasswordUseCase,
-  RecoverUserPasswordUseCase
+  RecoverUserPasswordUseCase,
+  GenerateNewTokensUseCase,
+  LogoutUseCase,
+  DeleteAllSessionExceptCurrentUseCase,
+  DeleteSpecifiedSessionUseCase
 ]
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
+    MongooseModule.forFeature([
+      { name: User.name, schema: UserSchema },
+      { name: Request.name, schema: RequestSchema },
+      { name: Session.name, schema: SessionSchema }
+    ]),
     JwtModule,
     CqrsModule.forRoot()
   ],
-  controllers: [UsersController, AuthController],
+  controllers: [UsersController, AuthController, SecurityDevicesController],
   providers: [
     UsersService,
     UsersRepository,
@@ -60,22 +81,36 @@ const commandHandlers = [
     ...commandHandlers,
     {
       provide: ACCESS_TOKEN_STRATEGY_INJECT_TOKEN,
-      useFactory: (): JwtService => {
+      useFactory: (
+        coreConfig: CoreConfig,
+        usersConfig: UsersConfig
+      ): JwtService => {
         return new JwtService({
-          secret: 'access-token-secret',
-          signOptions: { expiresIn: '5m' },
+          secret: coreConfig.accessTokenSecret,
+          //@ts-ignore
+          signOptions: { expiresIn: usersConfig.accessTokenExpirationTime },
         })
-      }
+      },
+      inject: [CoreConfig, UsersConfig]
     },
     {
       provide: REFRESH_TOKEN_STRATEGY_INJECT_TOKEN,
-      useFactory: (): JwtService => {
+      useFactory: (
+        coreConfig: CoreConfig,
+        usersConfig: UsersConfig
+      ): JwtService => {
         return new JwtService({
-          secret: 'refresh-token-secret',
-          signOptions: { expiresIn: '24h' },
+          secret: coreConfig.refreshTokenSecret,
+          //@ts-ignore
+          signOptions: { expiresIn: usersConfig.refreshTokenExpirationTime },
         })
-      }
-    }
+      },
+      inject: [CoreConfig, UsersConfig]
+    },
+    UsersConfig,
+    CoreConfig,
+    RequestsRepository,
+    SessionsRepository
   ],
   exports: [
     UsersService,

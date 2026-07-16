@@ -6,23 +6,21 @@ import { Request, Response } from "express";
 import { Inject } from "@nestjs/common";
 import { ACCESS_TOKEN_STRATEGY_INJECT_TOKEN, REFRESH_TOKEN_STRATEGY_INJECT_TOKEN } from "../../../../../core/constants/jwt-tokens";
 import { randomUUID } from "crypto";
-import { InjectModel } from "@nestjs/mongoose";
-import { Session, type SessionModelType } from "../../../../sessions/session.entity";
 import { CreateSessionDto } from "../../../../sessions/dto/create-session.dto";
 import { SessionsRepository } from "../../../../sessions/sessions.repository";
+import { SessionInfo } from "../../../../sessions/dto/session-info.dto";
 
 
-export class LoginUserCommand {
+export class GenerateNewTokensCommand {
     constructor(
-        public readonly dto: LoginInputDto,
-        public readonly req: Request,
+        public readonly session: SessionInfo,
         public readonly res: Response
     ) { }
 }
 
-@CommandHandler(LoginUserCommand)
-export class LoginUserUseCase
-    implements ICommandHandler<LoginUserCommand> {
+@CommandHandler(GenerateNewTokensCommand)
+export class GenerateNewTokensUseCase
+    implements ICommandHandler<GenerateNewTokensCommand> {
     constructor(
         @Inject(ACCESS_TOKEN_STRATEGY_INJECT_TOKEN)
         private readonly AccessTokenService: JwtService,
@@ -31,16 +29,12 @@ export class LoginUserUseCase
         private readonly RefreshTokenService: JwtService,
 
         private readonly SessionsRepository: SessionsRepository,
-
-        private readonly AuthService: AuthService,
     ) { }
 
-    async execute({ dto, req, res }: LoginUserCommand): Promise<{ accessToken: string }> {
+    async execute({ session, res }: GenerateNewTokensCommand) {
 
-        const user = await this.AuthService.checkCredentials(dto)
-
-        const userId = user._id.toString()
-        const deviceId = randomUUID().toString()
+        const userId = session.userId
+        const deviceId = session.deviceId
 
         const accessToken = this.AccessTokenService.sign({ id: userId })
 
@@ -48,16 +42,7 @@ export class LoginUserUseCase
 
         const refreshTokenPayload = await this.RefreshTokenService.verify(refreshToken)
 
-        const newSession: CreateSessionDto = {
-            ip: req.ip!,
-            title: req.headers["user-agent"] || "Device",
-            lastActiveDate: refreshTokenPayload.iat!.toString(),
-            deviceId: deviceId,
-            userId: userId,
-            exp: refreshTokenPayload.exp!.toString()
-        }
-
-        await this.SessionsRepository.addNewSession(newSession)
+        await this.SessionsRepository.updateSessionInformation(userId, deviceId, refreshTokenPayload.iat)
 
         res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true })
 
