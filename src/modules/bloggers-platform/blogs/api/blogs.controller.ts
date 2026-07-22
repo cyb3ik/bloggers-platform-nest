@@ -2,11 +2,7 @@ import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, 
 import { BlogsQueryParams } from "./dto/blogs.query.params-dto";
 import { PostsQueryParams } from "../../posts/api/dto/posts.query.params-dto";
 import { CreateBlogInputDto, UpdateBlogInputDto } from "./dto/blogs.input-dto";
-import { CreatePostForBlogInputDto, CreatePostInputDto } from "../../posts/api/dto/posts.input-dto";
-import { BlogsService } from "../application/blogs.service";
-import { BlogsQueryRepository } from "../infrastructure/blogs.query.repository";
-import { PostsService } from "../../posts/application/posts.service";
-import { PostsQueryRepository } from "../../posts/infrastructure/posts.query.repository";
+import { CreatePostForBlogInputDto } from "../../posts/api/dto/posts.input-dto";
 import { Types } from "mongoose";
 import { CommandBus, QueryBus } from "@nestjs/cqrs";
 import { FindAllBlogsQuery } from "../application/use-cases/queries/find-all-blogs.query";

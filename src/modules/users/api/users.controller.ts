@@ -9,7 +9,7 @@ import { FindUserByIdQuery } from '../application/use-cases/queries/find-user-by
 import { FindAllUsersQuery } from '../application/use-cases/queries/find-all-users.query';
 import { DeleteUserCommand } from '../application/use-cases/commands/delete-user.usecase';
 
-@Controller('users')
+@Controller('sa/users')
 export class UsersController {
 
     constructor(

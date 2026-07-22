@@ -1,12 +1,8 @@
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
-import { LoginInputDto } from "../../../api/dto/login.input-dto";
 import { JwtService } from "@nestjs/jwt";
-import { AuthService } from "../../auth.service";
-import { Request, Response } from "express";
+import { Response } from "express";
 import { Inject } from "@nestjs/common";
 import { ACCESS_TOKEN_STRATEGY_INJECT_TOKEN, REFRESH_TOKEN_STRATEGY_INJECT_TOKEN } from "../../../../../core/constants/jwt-tokens";
-import { randomUUID } from "crypto";
-import { CreateSessionDto } from "../../../../sessions/dto/create-session.dto";
 import { SessionsRepository } from "../../../../sessions/sessions.repository";
 import { SessionInfo } from "../../../../sessions/dto/session-info.dto";
 
