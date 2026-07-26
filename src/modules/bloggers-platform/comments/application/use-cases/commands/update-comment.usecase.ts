@@ -1,5 +1,4 @@
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
-import { Types } from "mongoose";
 import { ForbiddenException, NotFoundException } from "@nestjs/common";
 import { CommentsRepository } from "../../../infrastructure/comments.repository";
 import { UpdateCommentInputDto } from "../../../api/dto/comments.input-dto";
@@ -7,9 +6,9 @@ import { UpdateCommentInputDto } from "../../../api/dto/comments.input-dto";
 
 export class UpdateCommentCommand {
     constructor(
-        public readonly commentId: Types.ObjectId,
+        public readonly commentId: string,
         public readonly dto: UpdateCommentInputDto,
-        public readonly userId: Types.ObjectId,
+        public readonly userId: string,
     ) { }
 }
 
@@ -21,7 +20,7 @@ export class UpdateCommentUseCase
     ) { }
 
     async execute({ commentId, dto, userId }: UpdateCommentCommand): Promise<void> {
-        const comment = await this.CommentsRepository.findCommentById(commentId)
+        const comment = await this.CommentsRepository.findEntityById(commentId)
 
         if (!comment) {
             throw new NotFoundException('Comment was not found')

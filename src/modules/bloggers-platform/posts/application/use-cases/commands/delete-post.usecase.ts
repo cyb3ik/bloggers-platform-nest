@@ -6,7 +6,7 @@ import { PostsRepository } from "../../../infrastructure/posts.repository";
 
 export class DeletePostCommand {
     constructor(
-        public readonly postId: Types.ObjectId
+        public readonly postId: string
     ) { }
 }
 
@@ -18,13 +18,13 @@ export class DeletePostUseCase
     ) { }
 
     async execute({ postId }: DeletePostCommand): Promise<void> {
-        const post = await this.PostsRepository.findPostById(postId)
+        const post = await this.PostsRepository.findEntityById(postId)
 
         if (!post) {
             throw new NotFoundException('Post was not found')
         }
 
-        await this.PostsRepository.delete(post)
+        post.softDeleteSelf()
 
         await this.PostsRepository.save(post)
     }

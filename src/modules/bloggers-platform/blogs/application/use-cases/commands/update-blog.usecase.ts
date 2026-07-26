@@ -7,7 +7,7 @@ import { NotFoundException } from "@nestjs/common";
 
 export class UpdateBlogCommand {
     constructor(
-        public readonly blogId: Types.ObjectId,
+        public readonly blogId: string,
         public readonly dto: UpdateBlogInputDto
     ) { }
 }
@@ -20,7 +20,7 @@ export class UpdateBlogUseCase
     ) { }
 
     async execute({ blogId, dto }: UpdateBlogCommand): Promise<void> {
-        const blog = await this.BlogsRepository.findBlogById(blogId)
+        const blog = await this.BlogsRepository.findEntityById(blogId)
 
         if (!blog) {
             throw new NotFoundException('Blog was not found')

@@ -1,6 +1,5 @@
-import { Types } from "mongoose";
 
 export class UserInfo {
-    id: Types.ObjectId
+    id: string
     login: string
 }

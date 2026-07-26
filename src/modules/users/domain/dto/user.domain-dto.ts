@@ -3,4 +3,5 @@ export class CreateDomainUserDto {
     email: string
     passwordSalt: string
     passwordHash: string
+    isConfirmed: boolean
 }

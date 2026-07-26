@@ -1,49 +1,53 @@
 import { Injectable } from "@nestjs/common"
 import { InjectModel } from "@nestjs/mongoose"
 import { Like, LikeDocument, type LikeModelType } from "../domain/like.entity"
-import { Types } from "mongoose"
 import { LikeViewDto } from "../dto/like-view.dto"
-import { LikeStatus } from "../dto/create-domain-like.dto"
+import { ILikesRepository } from "../../../../core/interfaces/repositories/likes/likes-repository.interface"
+import { Types } from "mongoose"
 
 @Injectable()
-export class LikesRepository {
+export class LikesRepository implements ILikesRepository {
     constructor(@InjectModel(Like.name) private readonly LikeModel: LikeModelType) { }
 
     async save(like: LikeDocument) {
         await like.save()
     }
 
-    async delete(like: LikeDocument) {
-        like.softDeleteSelf()
+    async findEntityById(id: string): Promise<LikeDocument | null> {
+        const like = await this.LikeModel.findOne(
+            {
+                _id: id
+            }
+        )
+
+        if (!like) {
+            return null
+        }
+
+        return like
     }
 
-    async getUserLikeEntityAndStatus(entityId: Types.ObjectId, userId: Types.ObjectId) {
-        const result = await this.LikeModel.findOne(
+    async findLikeByUserId(entityId: string, userId: string) {
+        const like = await this.LikeModel.findOne(
             {
-                entityId: entityId.toString(),
+                entityId: entityId,
                 userId: userId
             }
         )
 
-        if (!result) {
-            return {
-                status: LikeStatus.None,
-                like: null
-            }
+        if (!like) {
+            return null
         }
 
-        return {
-            status: result.status,
-            like: result
-        }
+        return like
     }
 
 
-    async getNewestLikesFromEntity(entityId: Types.ObjectId): Promise<LikeViewDto[]> {
+    async getNewestLikesFromEntity(entityId: string): Promise<LikeViewDto[]> {
         const items = await this.LikeModel
             .find(
                 {
-                    entityId: entityId.toString(),
+                    entityId: entityId,
                     status: "Like"
                 }
             )
@@ -51,5 +55,19 @@ export class LikesRepository {
             .exec()
 
         return items.map(like => new LikeViewDto(like)).slice(0, 3)
+    }
+
+    async getLikesAndDislikesCount(entityId: string): Promise<{ likesCount: number, dislikesCount: number }> {
+        const likesCount = await this.LikeModel.countDocuments({
+            entityId: entityId,
+            status: "Like"
+        })
+
+        const dislikesCount = await this.LikeModel.countDocuments({
+            entityId: entityId,
+            status: "Dislike"
+        })
+
+        return { likesCount: likesCount, dislikesCount: dislikesCount }
     }
 }

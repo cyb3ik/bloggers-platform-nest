@@ -11,7 +11,7 @@ import { UserInfo } from "../../../../../users/api/dto/user-info.dto";
 
 export class CreateCommentForPostCommand {
     constructor(
-        public readonly postId: Types.ObjectId,
+        public readonly postId: string,
         public readonly user: UserInfo,
         public readonly dto: CreateCommentInputDto
     ) { }
@@ -27,9 +27,9 @@ export class CreateCommentForPostUseCase
         private readonly PostsRepository: PostsRepository,
     ) { }
 
-    async execute({ postId, user, dto }: CreateCommentForPostCommand): Promise<Types.ObjectId> {
+    async execute({ postId, user, dto }: CreateCommentForPostCommand) {
 
-        const post = await this.PostsRepository.findPostById(postId)
+        const post = await this.PostsRepository.findEntityById(postId)
 
         if (!post) {
             throw new NotFoundException('Post not found')
@@ -46,6 +46,6 @@ export class CreateCommentForPostUseCase
 
         await this.CommentsRepository.save(comment)
 
-        return comment._id
+        return comment._id.toString()
     }
 }

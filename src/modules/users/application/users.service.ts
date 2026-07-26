@@ -1,9 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { User } from '../domain/user.entity';
 import { UsersRepository } from '../infrastructure/users.repository';
 import { BcryptService } from './bcrypt.service';
-import { Types } from 'mongoose';
 
 @Injectable()
 export class UsersService {
@@ -32,20 +29,11 @@ export class UsersService {
         }
     }
 
-    async updateUserPassword(id: Types.ObjectId, newPassword: string) {
-        const user = await this.UsersRepository.findUserById(id)
-
-        if (!user) {
-            //TODO: replace with domain exception
-            throw new NotFoundException('User not found')
-        }
-
+    async generatePasswordHashAndSalt(password: string) {
         const passwordSalt = await this.CryptoService.generateSalt(10)
-        const passwordHash = await this.CryptoService.generateHash(newPassword, passwordSalt)
+        const passwordHash = await this.CryptoService.generateHash(password, passwordSalt)
 
-        await this.UsersRepository.updateUserPassword(user, { passwordHash: passwordHash, passwordSalt: passwordSalt })
-
-        await this.UsersRepository.save(user)
+        return { passwordHash: passwordHash, passwordSalt: passwordSalt }
     }
 
 }

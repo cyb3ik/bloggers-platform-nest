@@ -1,7 +1,6 @@
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
 import { AuthService, CodeType } from "../../auth.service";
 import { UsersRepository } from "../../../../users/infrastructure/users.repository";
-import { BadRequestException, NotFoundException } from "@nestjs/common";
 import { NewPasswordInput } from "../../../api/dto/new-password.input-dto";
 import { UsersService } from "../../../../users/application/users.service";
 
@@ -25,6 +24,10 @@ export class ChangeUserPasswordUseCase
 
         await this.AuthService.checkIfCodeIsValid(user, dto.recoveryCode, { codeType: CodeType.recovery })
 
-        await this.UsersService.updateUserPassword(user._id, dto.newPassword)
+        const newPasswordInfo = await this.UsersService.generatePasswordHashAndSalt(dto.newPassword)
+
+        user.updatePassword(newPasswordInfo)
+
+        await this.UsersRepository.save(user)
     }
 }

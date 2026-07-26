@@ -1,5 +1,4 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { LikesInfo } from "../../comments/domain/comment.entity";
 import { CreateDomainPostDto } from "./dto/posts.domain-dto";
 import { HydratedDocument, Model } from "mongoose";
 import { UpdatePostInputDto } from "../api/dto/posts.input-dto";
@@ -21,9 +20,6 @@ export class Post {
     @Prop({ type: String, required: true })
     blogName: string
 
-    @Prop({ type: LikesInfo, required: true })
-    likesInfo: LikesInfo
-
     createdAt: Date
     updatedAt: Date
 
@@ -37,10 +33,6 @@ export class Post {
         post.content = dto.content
         post.blogId = dto.blogId
         post.blogName = dto.blogName
-        post.likesInfo = {
-            likesCount: 0,
-            dislikesCount: 0
-        }
 
         return post as PostDocument
     }
@@ -60,10 +52,6 @@ export class Post {
         this.blogName = dto.blogName
     }
 
-    updateLikesCount(likesCount: number, dislikesCount: number) {
-        this.likesInfo.likesCount += likesCount
-        this.likesInfo.dislikesCount += dislikesCount
-    }
 }
 
 export const PostSchema = SchemaFactory.createForClass(Post)

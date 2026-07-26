@@ -5,8 +5,8 @@ import { UpdateCommentInputDto } from "../api/dto/comments.input-dto";
 
 @Schema({ _id: false })
 export class CommentatorInfo {
-    @Prop({ type: Types.ObjectId, required: true })
-    userId: Types.ObjectId
+    @Prop({ type: String, required: true })
+    userId: string
 
     @Prop({ type: String, required: true })
     userLogin: string
@@ -15,31 +15,17 @@ export class CommentatorInfo {
 export const CommentatorInfoSchema =
     SchemaFactory.createForClass(CommentatorInfo);
 
-@Schema({ _id: false })
-export class LikesInfo {
-    @Prop({ type: Number, required: true, default: 0 })
-    likesCount: number
-
-    @Prop({ type: Number, required: true, default: 0 })
-    dislikesCount: number
-}
-
-export const LikesInfoSchema = SchemaFactory.createForClass(LikesInfo)
-
 @Schema({ timestamps: true })
 export class Comment {
 
-    @Prop({ type: Types.ObjectId, required: true })
-    postId: Types.ObjectId
+    @Prop({ type: String, required: true })
+    postId: string
 
     @Prop({ type: String, required: true })
     content: string
 
     @Prop({ type: CommentatorInfo, required: true })
     commentatorInfo: CommentatorInfo
-
-    @Prop({ type: LikesInfo, required: true })
-    likesInfo: LikesInfo
 
     createdAt: Date
     updatedAt: Date
@@ -52,10 +38,6 @@ export class Comment {
         comment.postId = dto.postId
         comment.content = dto.content
         comment.commentatorInfo = dto.commentatorInfo
-        comment.likesInfo = {
-            likesCount: 0,
-            dislikesCount: 0
-        }
 
         return comment as CommentDocument
     }
@@ -69,11 +51,6 @@ export class Comment {
 
     update(dto: UpdateCommentInputDto) {
         this.content = dto.content
-    }
-
-    updateLikesCount(likesCount: number, dislikesCount: number) {
-        this.likesInfo.likesCount += likesCount
-        this.likesInfo.dislikesCount += dislikesCount
     }
 }
 

@@ -1,18 +1,18 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Blog } from "../domain/blog.entity";
 import type { BlogModelType } from "../domain/blog.entity";
 import { BlogViewDto } from "../api/dto/blogs.view-dto";
 import { BlogsQueryParams } from "../api/dto/blogs.query.params-dto";
 import { PaginatedViewDto } from "../../../../core/dto/paginated.view-dto";
-import { Types } from "mongoose";
+import { BaseQueryRepository } from "../../../../core/interfaces/repositories/query-repository.interface";
 
 
 @Injectable()
-export class BlogsQueryRepository {
+export class BlogsQueryRepository implements BaseQueryRepository<BlogViewDto, BlogsQueryParams> {
     constructor(@InjectModel(Blog.name) private readonly BlogModel: BlogModelType) { }
 
-    async findBlogById(id: Types.ObjectId): Promise<BlogViewDto | null> {
+    async getEntityById(id: string): Promise<BlogViewDto | null> {
         const blog = await this.BlogModel.findOne({
             _id: id,
             deletedAt: null,
@@ -25,7 +25,7 @@ export class BlogsQueryRepository {
         return new BlogViewDto(blog)
     }
 
-    async findAllBlogs(query: BlogsQueryParams): Promise<PaginatedViewDto<BlogViewDto[]>> {
+    async getAllEntities(query: BlogsQueryParams): Promise<PaginatedViewDto<BlogViewDto[]>> {
 
         const { pageNumber, pageSize, sortBy, sortDirection, searchNameTerm } = query
 

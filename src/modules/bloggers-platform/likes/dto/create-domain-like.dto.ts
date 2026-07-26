@@ -1,8 +1,6 @@
-import { Types } from "mongoose"
-
 export class CreateDomainLikeDto {
-    userId: Types.ObjectId
-    entityId: Types.ObjectId
+    userId: string
+    entityId: string
     userLogin: string
     status: LikeStatus
 }

@@ -2,6 +2,7 @@ import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { HydratedDocument, Model } from "mongoose";
 import { CreateDomainUserDto } from "./dto/user.domain-dto";
 import { add } from "date-fns/add"
+import { MePageView } from "../../auth/api/dto/view/me-page-view.dto";
 
 @Schema({ _id: false })
 class EmailConfirmationInfo {
@@ -58,7 +59,7 @@ export class User {
         user.passwordHash = dto.passwordHash
         user.login = dto.login
         user.emailConfirmation = {
-            isConfirmed: false
+            isConfirmed: dto.isConfirmed
         }
 
         return user as UserDocument
@@ -69,6 +70,17 @@ export class User {
             throw new Error('Entity already deleted');
         }
         this.deletedAt = new Date();
+    }
+
+    updatePassword(newPasswordInfo: { passwordHash: string, passwordSalt: string }) {
+        if (!this.passwordRecovery) {
+            throw new Error("Password already recovered")
+        }
+
+        this.passwordHash = newPasswordInfo.passwordHash
+        this.passwordSalt = newPasswordInfo.passwordSalt
+
+        this.forbidPasswordRecovery()
     }
 
     forbidPasswordRecovery() {
@@ -94,6 +106,7 @@ export class User {
     setEmailConfirmationStatus(flag: boolean) {
         this.emailConfirmation.isConfirmed = flag
     }
+
 }
 
 export const UserSchema = SchemaFactory.createForClass(User)

@@ -4,11 +4,11 @@ import { CreateDomainLikeDto, LikeStatus } from "../dto/create-domain-like.dto";
 
 @Schema({ timestamps: true })
 export class Like {
-    @Prop({ type: Types.ObjectId, required: true })
-    userId: Types.ObjectId
+    @Prop({ type: String, required: true })
+    userId: string
 
-    @Prop({ type: Types.ObjectId, required: true })
-    entityId: Types.ObjectId
+    @Prop({ type: String, required: true })
+    entityId: string
 
     @Prop({ type: String, required: true })
     userLogin: string

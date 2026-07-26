@@ -9,7 +9,7 @@ import { FindUserByIdQuery } from '../application/use-cases/queries/find-user-by
 import { FindAllUsersQuery } from '../application/use-cases/queries/find-all-users.query';
 import { DeleteUserCommand } from '../application/use-cases/commands/delete-user.usecase';
 
-@Controller('sa/users')
+@Controller('users')
 export class UsersController {
 
     constructor(
@@ -27,7 +27,7 @@ export class UsersController {
     @Get(':id')
     @UseGuards(BasicAuthGuard)
     @HttpCode(HttpStatus.OK)
-    async findUserById(@Param('id') id: Types.ObjectId) {
+    async findUserById(@Param('id') id: string) {
         return this.QueryBus.execute(new FindUserByIdQuery(id))
     }
 
@@ -43,7 +43,7 @@ export class UsersController {
     @Delete(':id')
     @UseGuards(BasicAuthGuard)
     @HttpCode(HttpStatus.NO_CONTENT)
-    async deleteUserById(@Param('id') id: Types.ObjectId) {
+    async deleteUserById(@Param('id') id: string) {
         return this.CommandBus.execute(new DeleteUserCommand(id))
     }
 }

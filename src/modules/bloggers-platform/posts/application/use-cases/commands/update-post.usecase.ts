@@ -8,7 +8,7 @@ import { BlogsRepository } from "../../../../blogs/infrastructure/blogs.reposito
 
 export class UpdatePostCommand {
     constructor(
-        public readonly postId: Types.ObjectId,
+        public readonly postId: string,
         public readonly dto: UpdatePostInputDto
     ) { }
 }
@@ -22,15 +22,15 @@ export class UpdatePostUseCase
     ) { }
 
     async execute({ postId, dto }: UpdatePostCommand): Promise<void> {
-        const post = await this.PostsRepository.findPostById(postId)
+        const post = await this.PostsRepository.findEntityById(postId)
 
         if (!post) {
             throw new NotFoundException('Post was not found')
         }
 
-        const blogId = new Types.ObjectId(dto.blogId)
+        const blogId = dto.blogId
 
-        const blog = await this.BlogsRepository.findBlogById(blogId)
+        const blog = await this.BlogsRepository.findEntityById(blogId)
 
         if (!blog) {
             throw new NotFoundException('Blog was not found')

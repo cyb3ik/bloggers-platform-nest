@@ -19,7 +19,7 @@ export class FindAllUsersQueryHandler implements IQueryHandler<FindAllUsersQuery
         private readonly UsersQueryRepository: UsersQueryRepository) { }
 
     async execute(query: FindAllUsersQuery): Promise<PaginatedViewDto<UserViewDto[]>> {
-        const users = await this.UsersQueryRepository.findAllUsers(query.query)
+        const users = await this.UsersQueryRepository.getAllEntities(query.query)
 
         return users
     }

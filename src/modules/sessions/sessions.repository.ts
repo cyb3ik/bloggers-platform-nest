@@ -1,19 +1,32 @@
 import { Injectable } from "@nestjs/common";
-import { Session, type SessionModelType } from "./session.entity";
+import { Session, SessionDocument, type SessionModelType } from "./session.entity";
 import { InjectModel } from "@nestjs/mongoose";
 import { CreateSessionDto } from "./dto/create-session.dto";
+import { ISessionsRepository } from "../../core/interfaces/repositories/sessions/sessions-repository.interface";
+import { Document, Types } from "mongoose";
+import { SessionViewDto } from "./dto/session.view-dto";
 
 @Injectable()
-export class SessionsRepository {
+export class SessionsRepository implements ISessionsRepository {
     constructor(
         @InjectModel(Session.name)
         private readonly SessionModel: SessionModelType,
     ) { }
 
-    async addNewSession(sessionInfo: CreateSessionDto) {
-        const session = this.SessionModel.createInstance(sessionInfo)
-
+    async save(session: SessionDocument) {
         await session.save()
+    }
+
+    async findEntityById(id: string): Promise<SessionDocument | null> {
+        const session = await this.SessionModel.findOne({
+            _id: id
+        })
+
+        if (!session) {
+            return null
+        }
+
+        return session
     }
 
     async findAllUserSessions(userId: string) {

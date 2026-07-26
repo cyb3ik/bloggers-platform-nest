@@ -2,21 +2,18 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Blog, BlogDocument } from '../domain/blog.entity';
 import { Injectable } from '@nestjs/common';
 import type { BlogModelType } from '../domain/blog.entity';
-import { Types } from 'mongoose';
+
+import { BaseRepository } from '../../../../core/interfaces/repositories/base-repository.interface';
 
 @Injectable()
-export class BlogsRepository {
+export class BlogsRepository implements BaseRepository<BlogDocument> {
     constructor(@InjectModel(Blog.name) private readonly BlogModel: BlogModelType) { }
 
     async save(blog: BlogDocument) {
         await blog.save()
     }
 
-    async delete(blog: BlogDocument) {
-        blog.softDeleteSelf()
-    }
-
-    async findBlogById(id: Types.ObjectId): Promise<BlogDocument | null> {
+    async findEntityById(id: string): Promise<BlogDocument | null> {
         const blog = await this.BlogModel.findOne({
             _id: id,
             deletedAt: null,

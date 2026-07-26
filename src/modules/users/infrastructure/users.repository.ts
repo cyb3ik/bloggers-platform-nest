@@ -2,36 +2,25 @@ import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from '../domain/user.entity';
 import { Injectable } from '@nestjs/common';
 import type { UserModelType } from '../domain/user.entity';
-import { Types } from 'mongoose';
+import { BaseRepository } from '../../../core/interfaces/repositories/base-repository.interface';
+import { IUsersRepository } from '../../../core/interfaces/repositories/users/users-repository.interface';
 
 @Injectable()
-export class UsersRepository {
+export class UsersRepository implements IUsersRepository {
     constructor(@InjectModel(User.name) private readonly UserModel: UserModelType) { }
 
-    async save(user: UserDocument) {
+    async save(user: UserDocument): Promise<void> {
         await user.save()
+        return
     }
 
-    async delete(user: UserDocument) {
-        user.softDeleteSelf()
-    }
-
-    async updateUserPassword(user: UserDocument, newPasswordInfo: { passwordHash: string, passwordSalt: string }) {
-        const { passwordHash, passwordSalt } = newPasswordInfo
-
-        user.passwordHash = passwordHash
-        user.passwordSalt = passwordSalt
-
-        user.forbidPasswordRecovery()
-    }
-
-    async findUserById(id: Types.ObjectId): Promise<UserDocument | null> {
+    async findEntityById(id: string): Promise<UserDocument | null> {
         const user = await this.UserModel.findOne({
             _id: id,
             deletedAt: null,
         })
 
-        return user
+        return user as UserDocument | null
     }
 
     async findUserByEmail(email: string): Promise<UserDocument | null> {

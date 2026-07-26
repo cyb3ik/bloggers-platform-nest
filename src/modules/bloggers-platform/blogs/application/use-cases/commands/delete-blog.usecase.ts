@@ -1,12 +1,11 @@
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
-import { Types } from "mongoose";
 import { BlogsRepository } from "../../../infrastructure/blogs.repository";
 import { NotFoundException } from "@nestjs/common";
 
 
 export class DeleteBlogCommand {
     constructor(
-        public readonly blogId: Types.ObjectId
+        public readonly blogId: string
     ) { }
 }
 
@@ -18,13 +17,13 @@ export class DeleteBlogUseCase
     ) { }
 
     async execute({ blogId }: DeleteBlogCommand): Promise<void> {
-        const blog = await this.BlogsRepository.findBlogById(blogId)
+        const blog = await this.BlogsRepository.findEntityById(blogId)
 
         if (!blog) {
             throw new NotFoundException('Blog was not found')
         }
 
-        await this.BlogsRepository.delete(blog)
+        blog.softDeleteSelf()
 
         await this.BlogsRepository.save(blog)
     }

@@ -34,7 +34,7 @@ export class BlogsController {
 
     @Get(':id')
     @HttpCode(HttpStatus.OK)
-    async findBlogById(@Param('id') id: Types.ObjectId) {
+    async findBlogById(@Param('id') id: string) {
 
         return this.QueryBus.execute(new FindBlogByIdQuery(id))
     }
@@ -44,7 +44,7 @@ export class BlogsController {
     @HttpCode(HttpStatus.OK)
     async findAllPostsFromBlog(
         @CheckGuestStatus() user: UserInfo | null,
-        @Param('blogId') blogId: Types.ObjectId,
+        @Param('blogId') blogId: string,
         @Query() query: PostsQueryParams) {
 
         if (user) {
@@ -68,7 +68,7 @@ export class BlogsController {
     @UseGuards(BasicAuthGuard)
     @HttpCode(HttpStatus.CREATED)
     async createPostForBlog(
-        @Param('blogId') blogId: Types.ObjectId,
+        @Param('blogId') blogId: string,
         @Body() dto: CreatePostForBlogInputDto) {
 
         const createdPostId = await this.CommandBus.execute(new CreatePostForBlogCommand(blogId, dto))
@@ -80,7 +80,7 @@ export class BlogsController {
     @UseGuards(BasicAuthGuard)
     @HttpCode(HttpStatus.NO_CONTENT)
     async updateBlogById(
-        @Param('id') id: Types.ObjectId,
+        @Param('id') id: string,
         @Body() dto: UpdateBlogInputDto) {
 
         return this.CommandBus.execute(new UpdateBlogCommand(id, dto))
@@ -89,7 +89,7 @@ export class BlogsController {
     @Delete(':id')
     @UseGuards(BasicAuthGuard)
     @HttpCode(HttpStatus.NO_CONTENT)
-    async deleteBlogById(@Param('id') id: Types.ObjectId) {
+    async deleteBlogById(@Param('id') id: string) {
 
         return this.CommandBus.execute(new DeleteBlogCommand(id))
     }

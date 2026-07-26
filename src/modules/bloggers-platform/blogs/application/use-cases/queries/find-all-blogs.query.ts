@@ -18,7 +18,7 @@ export class FindAllBlogsQueryHandler implements IQueryHandler<FindAllBlogsQuery
         private readonly BlogsQueryRepository: BlogsQueryRepository) { }
 
     async execute(query: FindAllBlogsQuery): Promise<PaginatedViewDto<BlogViewDto[]>> {
-        const blogs = await this.BlogsQueryRepository.findAllBlogs(query.query)
+        const blogs = await this.BlogsQueryRepository.getAllEntities(query.query)
 
         return blogs
     }

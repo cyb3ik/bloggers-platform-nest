@@ -1,14 +1,11 @@
-import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from "@nestjs/common";
+import { BadRequestException, Injectable, UnauthorizedException } from "@nestjs/common";
 import { UsersRepository } from "../../users/infrastructure/users.repository";
 import { BcryptService } from "../../users/application/bcrypt.service";
-import { JwtService } from "@nestjs/jwt";
-import { AuthQueryRepository } from "../infrastructure/auth.query.repository";
 import { MailService } from "./mail.service";
-import { UsersService } from "../../users/application/users.service";
 import { randomUUID } from "crypto";
-import { NewPasswordInput } from "../api/dto/new-password.input-dto";
 import { LoginInputDto } from "../api/dto/login.input-dto";
 import { UserDocument } from "../../users/domain/user.entity";
+import { MePageView } from "../api/dto/view/me-page-view.dto";
 
 export enum CodeType {
     emailConfirmation = "emailConfimation",
@@ -115,6 +112,12 @@ export class AuthService {
         }
 
         await this.UsersRepository.save(user)
+    }
+
+    async getMePage(id: string) {
+        const user = await this.UsersRepository.findEntityById(id)
+
+        return new MePageView(user)
     }
 
 }

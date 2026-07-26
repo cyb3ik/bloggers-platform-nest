@@ -1,17 +1,17 @@
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from '../domain/user.entity';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import type { UserModelType } from '../domain/user.entity';
 import { UserViewDto } from '../api/dto/users.view-dto';
 import { UsersQueryParams } from '../api/dto/users.query.params-dto';
 import { PaginatedViewDto } from '../../../core/dto/paginated.view-dto';
-import { Types } from 'mongoose';
+import { BaseQueryRepository } from '../../../core/interfaces/repositories/query-repository.interface';
 
 @Injectable()
-export class UsersQueryRepository {
+export class UsersQueryRepository implements BaseQueryRepository<UserViewDto, UsersQueryParams> {
     constructor(@InjectModel(User.name) private readonly UserModel: UserModelType) { }
 
-    async findUserById(id: Types.ObjectId): Promise<UserViewDto | null> {
+    async getEntityById(id: string): Promise<UserViewDto | null> {
         const user = await this.UserModel.findOne({
             _id: id,
             deletedAt: null,
@@ -24,7 +24,7 @@ export class UsersQueryRepository {
         return new UserViewDto(user)
     }
 
-    async findAllUsers(query: UsersQueryParams): Promise<PaginatedViewDto<UserViewDto[]>> {
+    async getAllEntities(query: UsersQueryParams): Promise<PaginatedViewDto<UserViewDto[]>> {
 
         const { pageNumber, pageSize, sortBy, sortDirection, searchLoginTerm, searchEmailTerm } = query
 

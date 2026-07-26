@@ -11,8 +11,13 @@ export class PostViewDto {
     blogId: string
     blogName: string
     createdAt: Date
-    extendedLikesInfo: LikesInfo | { myStatus: LikeStatus } | { newestLikes: LikeViewDto[] }
-    constructor(post: PostDocument, likeStatus: LikeStatus = LikeStatus.None, newestLikes: LikeViewDto[] = []) {
+    extendedLikesInfo: {
+        likesCount: number
+        dislikesCount: number
+        myStatus: LikeStatus
+        newestLikes: LikeViewDto[]
+    }
+    constructor(post: PostDocument) {
         this.id = post._id.toString()
         this.title = post.title
         this.shortDescription = post.shortDescription
@@ -20,9 +25,12 @@ export class PostViewDto {
         this.blogId = post.blogId
         this.blogName = post.blogName
         this.createdAt = post.createdAt
+    }
+
+    addLikesInfo(likesCount: number, dislikesCount: number, likeStatus: LikeStatus, newestLikes: LikeViewDto[]) {
         this.extendedLikesInfo = {
-            likesCount: post.likesInfo.likesCount,
-            dislikesCount: post.likesInfo.dislikesCount,
+            likesCount: likesCount,
+            dislikesCount: dislikesCount,
             myStatus: likeStatus,
             newestLikes: newestLikes
         }

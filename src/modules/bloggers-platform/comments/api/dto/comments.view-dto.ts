@@ -6,17 +6,24 @@ export class CommentViewDto {
     content: string
     commentatorInfo: CommentatorInfo
     createdAt: Date
-    likesInfo: LikesInfo | { myStatus: LikeStatus }
+    likesInfo: {
+        likesCount: number,
+        dislikesCount: number,
+        likeStatus: LikeStatus
+    }
 
-    constructor(comment: CommentDocument, likeStatus: LikeStatus = LikeStatus.None) {
+    constructor(comment: CommentDocument) {
         this.id = comment._id.toString()
         this.content = comment.content
         this.commentatorInfo = comment.commentatorInfo
         this.createdAt = comment.createdAt
+    }
+
+    addLikesInfo(likesCount: number, dislikesCount: number, likeStatus: LikeStatus) {
         this.likesInfo = {
-            likesCount: comment.likesInfo.likesCount,
-            dislikesCount: comment.likesInfo.dislikesCount,
-            myStatus: likeStatus
+            likesCount: likesCount,
+            dislikesCount: dislikesCount,
+            likeStatus: likeStatus
         }
     }
 }

@@ -10,7 +10,7 @@ import { LikeStatus } from '../../../../likes/dto/create-domain-like.dto';
 export class FindAllPostsQuery extends Query<PaginatedViewDto<PostViewDto[]>> {
     constructor(
         public readonly query: PostsQueryParams,
-        public readonly userId?: Types.ObjectId
+        public readonly userId?: string
     ) {
         super()
     }
@@ -24,32 +24,26 @@ export class FindAllPostsQueryHandler implements IQueryHandler<FindAllPostsQuery
     ) { }
 
     async execute(query: FindAllPostsQuery): Promise<PaginatedViewDto<PostViewDto[]>> {
-        const { items, totalCount } = await this.PostsQueryRepository.findAllPosts(query.query)
+        const result = await this.PostsQueryRepository.getAllEntities(query.query)
 
-        const itemsWithStatuses = []
+        for (const item of result.items) {
+            let status = LikeStatus.None
 
-        if (query.userId) {
-            for (const item of items) {
-                const { status } = await this.LikesRepository.getUserLikeEntityAndStatus(item._id, query.userId)
+            if (query.userId) {
+                const like = await this.LikesRepository.findLikeByUserId(item.id, query.userId)
 
-                const newestLikes = await this.LikesRepository.getNewestLikesFromEntity(item._id)
-
-                itemsWithStatuses.push(new PostViewDto(item, status, newestLikes))
-
+                if (like) {
+                    status = like.status
+                }
             }
-        } else {
-            for (const item of items) {
-                const newestLikes = await this.LikesRepository.getNewestLikesFromEntity(item._id)
 
-                itemsWithStatuses.push(new PostViewDto(item, LikeStatus.None, newestLikes))
-            }
+            const { likesCount, dislikesCount } = await this.LikesRepository.getLikesAndDislikesCount(item.id)
+
+            const newestLikes = await this.LikesRepository.getNewestLikesFromEntity(item.id)
+
+            item.addLikesInfo(likesCount, dislikesCount, status, newestLikes)
         }
 
-        return PaginatedViewDto.mapToView({
-            items: itemsWithStatuses,
-            page: query.query.pageNumber,
-            size: query.query.pageSize,
-            totalCount: totalCount
-        })
+        return result
     }
 }

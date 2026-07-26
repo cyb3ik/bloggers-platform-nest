@@ -50,7 +50,7 @@ export class PostsController {
     @HttpCode(HttpStatus.OK)
     async findPostById(
         @CheckGuestStatus() user: UserInfo | null,
-        @Param('id') id: Types.ObjectId
+        @Param('id') id: string
     ) {
 
         if (user) {
@@ -65,7 +65,7 @@ export class PostsController {
     @HttpCode(HttpStatus.OK)
     async findAllCommentsFromPost(
         @CheckGuestStatus() user: UserInfo | null,
-        @Param('postId') postId: Types.ObjectId,
+        @Param('postId') postId: string,
         @Query() query: CommentsQueryParams
     ) {
 
@@ -81,7 +81,7 @@ export class PostsController {
     @HttpCode(HttpStatus.CREATED)
     async createPost(@Body() dto: CreatePostInputDto) {
 
-        const blogId = new Types.ObjectId(dto.blogId)
+        const blogId = dto.blogId
 
         const createdPostId = await this.CommandBus.execute(new CreatePostForBlogCommand(blogId, dto))
 
@@ -94,7 +94,7 @@ export class PostsController {
     @HttpCode(HttpStatus.CREATED)
     async createCommentForPost(
         @ExtractUserFromRequest() user: UserInfo,
-        @Param('postId') postId: Types.ObjectId,
+        @Param('postId') postId: string,
         @Body() dto: CreateCommentInputDto) {
 
         const createdCommentId = await this.CommandBus.execute(new CreateCommentForPostCommand(postId, user, dto))
@@ -107,7 +107,7 @@ export class PostsController {
     @HttpCode(HttpStatus.NO_CONTENT)
     async changeLikeStatus(
         @ExtractUserFromRequest() user: UserInfo,
-        @Param('postId') postId: Types.ObjectId,
+        @Param('postId') postId: string,
         @Body() dto: ChangeLikeStatusInputDto
     ) {
 
@@ -118,7 +118,7 @@ export class PostsController {
     @UseGuards(BasicAuthGuard)
     @HttpCode(HttpStatus.NO_CONTENT)
     async updatePostById(
-        @Param('id') id: Types.ObjectId,
+        @Param('id') id: string,
         @Body() dto: UpdatePostInputDto) {
 
         return this.CommandBus.execute(new UpdatePostCommand(id, dto))
@@ -127,7 +127,7 @@ export class PostsController {
     @Delete(':id')
     @UseGuards(BasicAuthGuard)
     @HttpCode(HttpStatus.NO_CONTENT)
-    async deletePostById(@Param('id') id: Types.ObjectId) {
+    async deletePostById(@Param('id') id: string) {
         return this.CommandBus.execute(new DeletePostCommand(id))
     }
 }

@@ -25,7 +25,7 @@ export class CommentsController {
     @HttpCode(HttpStatus.OK)
     async findCommentById(
         @CheckGuestStatus() user: UserInfo | null,
-        @Param('id') id: Types.ObjectId
+        @Param('id') id: string
     ) {
 
         if (user) {
@@ -40,7 +40,7 @@ export class CommentsController {
     @HttpCode(HttpStatus.NO_CONTENT)
     async changeLikeStatus(
         @ExtractUserFromRequest() user: UserInfo,
-        @Param('commentId') commentId: Types.ObjectId,
+        @Param('commentId') commentId: string,
         @Body() dto: ChangeLikeStatusInputDto
     ) {
 
@@ -52,7 +52,7 @@ export class CommentsController {
     @HttpCode(HttpStatus.NO_CONTENT)
     async updateCommentById(
         @ExtractUserFromRequest() user: UserInfo,
-        @Param('id') id: Types.ObjectId,
+        @Param('id') id: string,
         @Body() dto: UpdateCommentInputDto
     ) {
 
@@ -64,7 +64,7 @@ export class CommentsController {
     @HttpCode(HttpStatus.NO_CONTENT)
     async deleteCommentById(
         @ExtractUserFromRequest() user: UserInfo,
-        @Param('id') id: Types.ObjectId
+        @Param('id') id: string
     ) {
 
         return this.CommandBus.execute(new DeleteCommentCommand(id, user.id))

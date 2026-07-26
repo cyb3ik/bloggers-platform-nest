@@ -12,7 +12,7 @@ import { LikeStatus } from "../../../../likes/dto/create-domain-like.dto"
 
 export class ChangeLikeStatusOnCommentCommand {
     constructor(
-        public readonly commentId: Types.ObjectId,
+        public readonly commentId: string,
         public readonly user: UserInfo,
         public readonly dto: ChangeLikeStatusInputDto
     ) { }
@@ -22,8 +22,6 @@ export class ChangeLikeStatusOnCommentCommand {
 export class ChangeLikeStatusOnCommentUseCase
     implements ICommandHandler<ChangeLikeStatusOnCommentCommand> {
     constructor(
-        @InjectModel(Comment.name)
-        private readonly CommentModel: CommentModelType,
         @InjectModel(Like.name)
         private readonly LikeModel: LikeModelType,
         private readonly LikesRepository: LikesRepository,
@@ -32,13 +30,13 @@ export class ChangeLikeStatusOnCommentUseCase
 
     async execute({ commentId, user, dto }: ChangeLikeStatusOnCommentCommand): Promise<void> {
 
-        const comment = await this.CommentsRepository.findCommentById(commentId)
+        const comment = await this.CommentsRepository.findEntityById(commentId)
 
         if (!comment) {
             throw new NotFoundException('Comment not found')
         }
 
-        const { status, like } = await this.LikesRepository.getUserLikeEntityAndStatus(commentId, user.id)
+        const like = await this.LikesRepository.findLikeByUserId(commentId, user.id)
 
         if (!like) {
 
@@ -57,35 +55,22 @@ export class ChangeLikeStatusOnCommentUseCase
 
             await this.LikesRepository.save(newLike)
 
-            switch (dto.likeStatus) {
-                case (LikeStatus.Like):
-                    comment.updateLikesCount(1, 0)
-                    break
-                case (LikeStatus.Dislike):
-                    comment.updateLikesCount(0, 1)
-                    break
-            }
-
         } else {
-            if (status === LikeStatus.Like) {
+            if (like.status === LikeStatus.Like) {
                 switch (dto.likeStatus) {
                     case (LikeStatus.Dislike):
-                        comment.updateLikesCount(-1, 1)
                         like.updateLikeStatus(dto.likeStatus)
                         break
                     case (LikeStatus.None):
-                        comment.updateLikesCount(-1, 0)
                         like.updateLikeStatus(dto.likeStatus)
                         break
                 }
             } else {
                 switch (dto.likeStatus) {
                     case (LikeStatus.Like):
-                        comment.updateLikesCount(1, -1)
                         like.updateLikeStatus(dto.likeStatus)
                         break
                     case (LikeStatus.None):
-                        comment.updateLikesCount(0, -1)
                         like.updateLikeStatus(dto.likeStatus)
                         break
                 }

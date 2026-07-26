@@ -1,12 +1,10 @@
-import { InjectModel } from "@nestjs/mongoose";
 import { CreateUserInputDto } from "../../../api/dto/users.input-dto";
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
-import { Types } from "mongoose";
-import { User, type UserModelType } from "../../../domain/user.entity";
 import { UsersService } from "../../users.service";
 import { UsersRepository } from "../../../infrastructure/users.repository";
-import { BcryptService } from "../../bcrypt.service";
 import { UsersConfig } from "../../../users.config";
+import { InjectModel } from "@nestjs/mongoose";
+import { User, type UserModelType } from "../../../domain/user.entity";
 
 
 export class CreateUserCommand {
@@ -15,34 +13,33 @@ export class CreateUserCommand {
 
 @CommandHandler(CreateUserCommand)
 export class CreateUserUseCase
-    implements ICommandHandler<CreateUserCommand, Types.ObjectId> {
+    implements ICommandHandler<CreateUserCommand> {
     constructor(
         @InjectModel(User.name)
         private readonly UserModel: UserModelType,
         private readonly UsersService: UsersService,
         private readonly UsersRepository: UsersRepository,
-        private readonly CryptoService: BcryptService,
         private readonly UsersConfig: UsersConfig
     ) { }
 
-    async execute({ dto }: CreateUserCommand): Promise<Types.ObjectId> {
+    async execute({ dto }: CreateUserCommand): Promise<string> {
 
         await this.UsersService.checkIfUserIsUnique(dto.email, dto.login)
 
-        const passwordSalt = await this.CryptoService.generateSalt(10)
-        const passwordHash = await this.CryptoService.generateHash(dto.password, passwordSalt)
+        const passwordInfo = await this.UsersService.generatePasswordHashAndSalt(dto.password)
 
-        const user = this.UserModel.createInstance({
+        const userDomainDto = {
             email: dto.email,
             login: dto.login,
-            passwordSalt: passwordSalt,
-            passwordHash: passwordHash
-        })
+            passwordSalt: passwordInfo.passwordSalt,
+            passwordHash: passwordInfo.passwordHash,
+            isConfirmed: this.UsersConfig.isUserAutoConfirmed
+        }
 
-        user.setEmailConfirmationStatus(this.UsersConfig.isUserAutoConfirmed)
+        const user = this.UserModel.createInstance(userDomainDto)
 
         await this.UsersRepository.save(user)
 
-        return user._id
+        return user._id.toString()
     }
 }

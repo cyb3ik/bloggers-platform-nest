@@ -9,8 +9,8 @@ import { LikeStatus } from '../../../../likes/dto/create-domain-like.dto';
 
 export class FindPostByIdQuery extends Query<PostViewDto> {
     constructor(
-        public readonly postId: Types.ObjectId,
-        public readonly userId?: Types.ObjectId
+        public readonly postId: string,
+        public readonly userId?: string
     ) {
         super()
     }
@@ -24,7 +24,7 @@ export class FindPostByIdQueryHandler implements IQueryHandler<FindPostByIdQuery
     ) { }
 
     async execute(query: FindPostByIdQuery): Promise<PostViewDto> {
-        const post = await this.PostsQueryRepository.findPostById(
+        const post = await this.PostsQueryRepository.getEntityById(
             query.postId
         )
 
@@ -32,14 +32,22 @@ export class FindPostByIdQueryHandler implements IQueryHandler<FindPostByIdQuery
             throw new NotFoundException('Post not found')
         }
 
-        const newestLikes = await this.LikesRepository.getNewestLikesFromEntity(query.postId)
+        let status = LikeStatus.None
 
-        if (!query.userId) {
-            return new PostViewDto(post, LikeStatus.None, newestLikes)
+        if (query.userId) {
+            const like = await this.LikesRepository.findLikeByUserId(post.id, query.userId)
+
+            if (like) {
+                status = like.status
+            }
         }
 
-        const { status } = await this.LikesRepository.getUserLikeEntityAndStatus(query.postId, query.userId)
+        const { likesCount, dislikesCount } = await this.LikesRepository.getLikesAndDislikesCount(post.id)
 
-        return new PostViewDto(post, status, newestLikes)
+        const newestLikes = await this.LikesRepository.getNewestLikesFromEntity(post.id)
+
+        post.addLikesInfo(likesCount, dislikesCount, status, newestLikes)
+
+        return post
     }
 }

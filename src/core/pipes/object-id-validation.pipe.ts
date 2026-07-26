@@ -1,10 +1,12 @@
 import { ArgumentMetadata, BadRequestException, Injectable, PipeTransform } from "@nestjs/common";
-import { isValidObjectId, Types } from "mongoose";
+import { isValidObjectId } from "mongoose";
+
+const ids = ['id', 'blogId', 'postId', 'commentId', 'userId', 'deviceId']
 
 @Injectable()
 export class ObjectIdValidationPipe implements PipeTransform {
     transform(value: string, metadata: ArgumentMetadata) {
-        if (metadata.metatype === Types.ObjectId) {
+        if (ids.includes(metadata.data)) {
             if (!isValidObjectId(value)) {
                 throw new BadRequestException([
                     {
@@ -13,7 +15,7 @@ export class ObjectIdValidationPipe implements PipeTransform {
                     },
                 ])
             }
-            return value
+            return value.toString()
         }
         return value
     }

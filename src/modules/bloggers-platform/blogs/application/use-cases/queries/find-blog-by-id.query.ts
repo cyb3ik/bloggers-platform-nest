@@ -7,7 +7,7 @@ import { BlogsQueryRepository } from '../../../infrastructure/blogs.query.reposi
 
 export class FindBlogByIdQuery extends Query<BlogViewDto> {
     constructor(
-        public readonly blogId: Types.ObjectId
+        public readonly blogId: string
     ) {
         super()
     }
@@ -19,7 +19,7 @@ export class FindBlogByIdQueryHandler implements IQueryHandler<FindBlogByIdQuery
         private readonly BlogsQueryRepository: BlogsQueryRepository) { }
 
     async execute(query: FindBlogByIdQuery): Promise<BlogViewDto> {
-        const blog = await this.BlogsQueryRepository.findBlogById(
+        const blog = await this.BlogsQueryRepository.getEntityById(
             query.blogId
         )
 

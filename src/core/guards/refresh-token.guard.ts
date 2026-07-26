@@ -27,7 +27,7 @@ export class RefreshTokenGuard implements CanActivate {
 
             const payload = await this.JwtService.verify(token)
 
-            const user = await this.UsersRepository.findUserById(payload.id)
+            const user = await this.UsersRepository.findEntityById(payload.id)
 
             if (!user) {
                 throw new ForbiddenException()

@@ -30,7 +30,4 @@ export class UsersConfig {
         message: 'Set Env variable IS_USER_AUTOMATICALLY_CONFIRMED',
     })
     isUserAutoConfirmed: boolean
-
-
-
 }

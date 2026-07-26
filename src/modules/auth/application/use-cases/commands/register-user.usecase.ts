@@ -21,9 +21,9 @@ export class RegisterUserUseCase
 
     async execute({ dto }: RegisterUserCommand): Promise<void> {
 
-        const userId = await this.CommandBus.execute<CreateUserCommand, Types.ObjectId>(new CreateUserCommand(dto))
+        const userId = await this.CommandBus.execute(new CreateUserCommand(dto))
 
-        const user = await this.UsersRepository.findUserById(userId)
+        const user = await this.UsersRepository.findEntityById(userId)
 
         this.AuthService.sendCodeViaEmail(user, { codeType: CodeType.emailConfirmation }).catch(e => console.log(e))
     }

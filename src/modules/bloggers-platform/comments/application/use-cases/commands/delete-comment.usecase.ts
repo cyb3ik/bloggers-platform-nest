@@ -1,13 +1,12 @@
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
-import { Types } from "mongoose";
 import { ForbiddenException, NotFoundException } from "@nestjs/common";
 import { CommentsRepository } from "../../../infrastructure/comments.repository";
 
 
 export class DeleteCommentCommand {
     constructor(
-        public readonly commentId: Types.ObjectId,
-        public readonly userId: Types.ObjectId
+        public readonly commentId: string,
+        public readonly userId: string
     ) { }
 }
 
@@ -19,7 +18,7 @@ export class DeleteCommentUseCase
     ) { }
 
     async execute({ commentId, userId }: DeleteCommentCommand): Promise<void> {
-        const comment = await this.CommentsRepository.findCommentById(commentId)
+        const comment = await this.CommentsRepository.findEntityById(commentId)
 
         if (!comment) {
             throw new NotFoundException('Comment was not found')
@@ -29,7 +28,7 @@ export class DeleteCommentUseCase
             throw new ForbiddenException()
         }
 
-        await this.CommentsRepository.delete(comment)
+        comment.softDeleteSelf()
 
         await this.CommentsRepository.save(comment)
     }
