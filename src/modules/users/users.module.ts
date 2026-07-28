@@ -19,7 +19,6 @@ import { ChangeUserPasswordUseCase } from '../auth/application/use-cases/command
 import { RecoverUserPasswordUseCase } from '../auth/application/use-cases/commands/recover-user-password.usecase';
 import { GetMePageQueryHandler } from '../auth/application/use-cases/queries/get-me-page.query';
 import { JwtModule, JwtService } from '@nestjs/jwt';
-import { AuthQueryRepository } from '../auth/infrastructure/auth.query.repository';
 import { MailService } from '../auth/application/mail.service';
 import { AuthController } from '../auth/api/auth.controller';
 import { AuthService } from '../auth/application/auth.service';
@@ -75,7 +74,6 @@ const commandHandlers = [
     UsersQueryRepository,
     BcryptService,
     AuthService,
-    AuthQueryRepository,
     MailService,
     ...queryHandlers,
     ...commandHandlers,

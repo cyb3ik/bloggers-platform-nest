@@ -24,6 +24,8 @@ export class LoginUserCommand {
 export class LoginUserUseCase
     implements ICommandHandler<LoginUserCommand> {
     constructor(
+        @InjectModel(Session.name)
+        private readonly SessionModel: SessionModelType,
         @Inject(ACCESS_TOKEN_STRATEGY_INJECT_TOKEN)
         private readonly AccessTokenService: JwtService,
 
@@ -57,7 +59,9 @@ export class LoginUserUseCase
             exp: refreshTokenPayload.exp!.toString()
         }
 
-        await this.SessionsRepository.addNewSession(newSession)
+        const session = this.SessionModel.createInstance(newSession)
+
+        await this.SessionsRepository.save(session)
 
         res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true })
 
