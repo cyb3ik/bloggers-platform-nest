@@ -1,7 +1,7 @@
 import { ArgumentMetadata, BadRequestException, Injectable, PipeTransform } from "@nestjs/common";
 import { isValidObjectId } from "mongoose";
 
-const ids = ['id', 'blogId', 'postId', 'commentId', 'userId', 'deviceId']
+const ids = ['id', 'blogId', 'postId', 'commentId', 'userId']
 
 @Injectable()
 export class ObjectIdValidationPipe implements PipeTransform {
