@@ -1,45 +1,56 @@
 import { Injectable } from "@nestjs/common"
 import { InjectModel } from "@nestjs/mongoose"
-import { Like, LikeDocument, type LikeModelType } from "../domain/like.entity"
 import { LikeViewDto } from "../dto/like-view.dto"
 import { ILikesRepository } from "../../../../core/interfaces/repositories/likes/likes-repository.interface"
-import { Types } from "mongoose"
+import { MongoLike, type LikeModelType } from "../domain/like-mongoose.entity"
+import { Like } from "../domain/like-domain.entity"
+import { RawLikeData } from "../dto/like.raw-dto"
 
 @Injectable()
 export class LikesRepository implements ILikesRepository {
-    constructor(@InjectModel(Like.name) private readonly LikeModel: LikeModelType) { }
+    constructor(@InjectModel(MongoLike.name) private readonly LikeModel: LikeModelType) { }
 
-    async save(like: LikeDocument) {
-        await like.save()
+    async save(like: Like) {
+        const data = like.getPersistenceData()
+
+        await this.LikeModel.updateOne(
+            { _id: like.id },
+            { $set: data },
+            { upsert: true }
+        )
     }
 
-    async findEntityById(id: string): Promise<LikeDocument | null> {
-        const like = await this.LikeModel.findOne(
+    async findEntityById(id: string): Promise<Like | null> {
+        const likeDocument = await this.LikeModel.findOne(
             {
                 _id: id
             }
-        )
+        ).lean()
 
-        if (!like) {
+        if (!likeDocument) {
             return null
         }
 
-        return like
+        const likeData = RawLikeData.createFromDocument(likeDocument)
+
+        return new Like(likeData)
     }
 
     async findLikeByUserId(entityId: string, userId: string) {
-        const like = await this.LikeModel.findOne(
+        const likeDocument = await this.LikeModel.findOne(
             {
                 entityId: entityId,
                 userId: userId
             }
-        )
+        ).lean()
 
-        if (!like) {
+        if (!likeDocument) {
             return null
         }
 
-        return like
+        const likeData = RawLikeData.createFromDocument(likeDocument)
+
+        return new Like(likeData)
     }
 
 
@@ -52,9 +63,14 @@ export class LikesRepository implements ILikesRepository {
                 }
             )
             .sort({ createdAt: -1 })
-            .exec()
+            .lean()
 
-        return items.map(like => new LikeViewDto(like)).slice(0, 3)
+        return items.map(likeDocument => {
+            const likeData = RawLikeData.createFromDocument(likeDocument)
+
+            return new LikeViewDto(likeData)
+        })
+            .slice(0, 3)
     }
 
     async getLikesAndDislikesCount(entityId: string): Promise<{ likesCount: number, dislikesCount: number }> {

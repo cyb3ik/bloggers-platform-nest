@@ -1,12 +1,12 @@
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs"
 import { ChangeLikeStatusInputDto } from "../../../../likes/dto/change-like-status-input.dto"
-import { InjectModel } from "@nestjs/mongoose"
-import { Like, type LikeModelType } from "../../../../likes/domain/like.entity"
 import { LikesRepository } from "../../../../likes/repositories/likes-repository"
 import { NotFoundException } from "@nestjs/common"
 import { UserInfo } from "../../../../../users/api/dto/user-info.dto"
-import { LikeStatus } from "../../../../likes/dto/create-domain-like.dto"
 import { PostsRepository } from "../../../infrastructure/posts.repository"
+import { LikeStatus } from "../../../../likes/dto/like.raw-dto"
+import { Like } from "../../../../likes/domain/like-domain.entity"
+import { randomUUID } from "crypto"
 
 export class ChangeLikeStatusOnPostCommand {
     constructor(
@@ -20,8 +20,6 @@ export class ChangeLikeStatusOnPostCommand {
 export class ChangeLikeStatusOnPostUseCase
     implements ICommandHandler<ChangeLikeStatusOnPostCommand> {
     constructor(
-        @InjectModel(Like.name)
-        private readonly LikeModel: LikeModelType,
         private readonly LikesRepository: LikesRepository,
         private readonly PostsRepository: PostsRepository,
     ) { }
@@ -42,14 +40,16 @@ export class ChangeLikeStatusOnPostUseCase
                 return
             }
 
-            const newLike = this.LikeModel.createInstance(
-                {
-                    userId: user.id,
-                    entityId: postId,
-                    userLogin: user.login,
-                    status: dto.likeStatus
-                }
-            )
+            const likeDomainDto = {
+                id: randomUUID().toString(),
+                userId: user.id,
+                entityId: postId,
+                userLogin: user.login,
+                status: dto.likeStatus,
+                createdAt: new Date()
+            }
+
+            const newLike = new Like(likeDomainDto)
 
             await this.LikesRepository.save(newLike)
 
@@ -75,7 +75,5 @@ export class ChangeLikeStatusOnPostUseCase
             }
             await this.LikesRepository.save(like)
         }
-
-        await this.PostsRepository.save(post)
     }
 }

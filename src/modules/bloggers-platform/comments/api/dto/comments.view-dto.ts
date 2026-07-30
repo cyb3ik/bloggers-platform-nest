@@ -1,4 +1,4 @@
-import { LikeStatus } from '../../../likes/dto/create-domain-like.dto';
+import { LikeStatus } from '../../../likes/dto/like.raw-dto';
 import { CommentatorInfo, CommentDocument } from '../../domain/comment.entity';
 
 export class CommentViewDto {

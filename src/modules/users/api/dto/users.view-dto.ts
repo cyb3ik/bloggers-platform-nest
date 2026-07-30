@@ -1,4 +1,4 @@
-import { UserDocument } from '../../domain/user.entity';
+import { RawUserData } from '../../domain/dto/user.raw-dto';
 
 export class UserViewDto {
     id: string
@@ -6,10 +6,10 @@ export class UserViewDto {
     email: string
     createdAt: Date
 
-    constructor(user: UserDocument) {
-        this.id = user._id.toString()
-        this.login = user.login
-        this.email = user.email
-        this.createdAt = user.createdAt
+    constructor(data: RawUserData) {
+        this.id = data.id
+        this.login = data.login
+        this.email = data.email
+        this.createdAt = data.createdAt
     }
 }

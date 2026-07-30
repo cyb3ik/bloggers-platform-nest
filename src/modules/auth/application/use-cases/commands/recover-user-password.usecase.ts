@@ -24,7 +24,9 @@ export class RecoverUserPasswordUseCase
             throw new NotFoundException('User not found')
         }
 
-        if (user.passwordRecovery) {
+        const userData = user.getPersistenceData()
+
+        if (userData.passwordRecovery) {
             throw new BadRequestException(
                 [{
                     message: 'User with this email is recovering password already',

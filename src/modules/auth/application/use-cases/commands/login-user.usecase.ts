@@ -41,7 +41,7 @@ export class LoginUserUseCase
 
         const user = await this.AuthService.checkCredentials(dto)
 
-        const userId = user._id.toString()
+        const userId = user.id
         const deviceId = randomUUID().toString()
 
         const accessToken = this.AccessTokenService.sign({ id: userId })

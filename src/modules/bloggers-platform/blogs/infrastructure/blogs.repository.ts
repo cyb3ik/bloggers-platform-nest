@@ -1,24 +1,36 @@
 import { InjectModel } from '@nestjs/mongoose';
-import { Blog, BlogDocument } from '../domain/blog.entity';
+import { MongoBlog, type BlogModelType } from '../domain/blog-mongoose.entity';
 import { Injectable } from '@nestjs/common';
-import type { BlogModelType } from '../domain/blog.entity';
-
 import { BaseRepository } from '../../../../core/interfaces/repositories/base-repository.interface';
+import { Blog } from '../domain/blog-domain.entity';
+import { RawBlogData } from '../domain/dto/blog.raw-dto';
 
 @Injectable()
-export class BlogsRepository implements BaseRepository<BlogDocument> {
-    constructor(@InjectModel(Blog.name) private readonly BlogModel: BlogModelType) { }
+export class BlogsRepository implements BaseRepository<Blog> {
+    constructor(@InjectModel(MongoBlog.name) private readonly BlogModel: BlogModelType) { }
 
-    async save(blog: BlogDocument) {
-        await blog.save()
+    async save(blog: Blog) {
+        const data = blog.getPersistenceData()
+
+        await this.BlogModel.updateOne(
+            { _id: blog.id },
+            { $set: data },
+            { upsert: true }
+        )
     }
 
-    async findEntityById(id: string): Promise<BlogDocument | null> {
-        const blog = await this.BlogModel.findOne({
+    async findEntityById(id: string): Promise<Blog | null> {
+        const blogDocument = await this.BlogModel.findOne({
             _id: id,
             deletedAt: null,
-        })
+        }).lean()
 
-        return blog
+        if (!blogDocument) {
+            return null
+        }
+
+        const blogData = RawBlogData.createFromDocument(blogDocument)
+
+        return new Blog(blogData)
     }
 }

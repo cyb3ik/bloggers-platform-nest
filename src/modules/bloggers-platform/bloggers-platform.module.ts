@@ -1,6 +1,6 @@
 import { Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
-import { Blog, BlogSchema } from "./blogs/domain/blog.entity";
+import { MongoBlog, BlogSchema } from "./blogs/domain/blog-mongoose.entity";
 import { Post, PostSchema } from "./posts/domain/post.entity";
 import { Comment, CommentSchema } from "./comments/domain/comment.entity";
 import { BlogsService } from "./blogs/application/blogs.service";
@@ -33,11 +33,11 @@ import { ACCESS_TOKEN_STRATEGY_INJECT_TOKEN } from "../../core/constants/jwt-tok
 import { JwtService } from "@nestjs/jwt";
 import { UsersModule } from "../users/users.module";
 import { LikesRepository } from "./likes/repositories/likes-repository";
-import { Like, LikeSchema } from "./likes/domain/like.entity";
 import { FindAllPostsQueryHandler } from "./posts/application/use-cases/queries/find-all-posts.query";
 import { ChangeLikeStatusOnCommentUseCase } from "./comments/application/use-cases/commands/change-like-status-on-comment.usecase";
 import { CreateCommentForPostUseCase } from "./posts/application/use-cases/commands/create-comment-for-post.usecase";
 import { ChangeLikeStatusOnPostUseCase } from "./posts/application/use-cases/commands/change-like-status-on-post.usecase";
+import { LikeSchema, MongoLike } from "./likes/domain/like-mongoose.entity";
 
 const blogsCommands = [
     CreateBlogUseCase,
@@ -77,10 +77,10 @@ const queryHandlers = [...blogsQueries, ...postsQueries, ...commentsQueries]
 
 @Module({
     imports: [MongooseModule.forFeature([
-        { name: Blog.name, schema: BlogSchema },
+        { name: MongoBlog.name, schema: BlogSchema },
         { name: Post.name, schema: PostSchema },
         { name: Comment.name, schema: CommentSchema },
-        { name: Like.name, schema: LikeSchema }
+        { name: MongoLike.name, schema: LikeSchema }
     ]),
         UsersModule],
     providers: [

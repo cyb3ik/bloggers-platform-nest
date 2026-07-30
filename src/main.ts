@@ -5,6 +5,7 @@ import { HttpExceptionFilter } from './core/exception-filters/http.exception.fil
 import { ObjectIdValidationPipe } from './core/pipes/object-id-validation.pipe';
 import { CoreConfig } from './core/core.config';
 import cookieParser from 'cookie-parser';
+import { UUIDValidationPipe } from './core/pipes/uuid-validation.pipe';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule)
@@ -30,7 +31,7 @@ async function bootstrap() {
         throw new BadRequestException(errorsRes)
       }
     }),
-    new ObjectIdValidationPipe())
+    new UUIDValidationPipe())
 
   app.useGlobalFilters(new HttpExceptionFilter())
 

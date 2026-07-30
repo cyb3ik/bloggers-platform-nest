@@ -1,13 +1,14 @@
-import { UserDocument } from "../../../../users/domain/user.entity"
+import { User } from "../../../../users/domain/user-domain.entity"
 
 export class MePageView {
     email: string
     login: string
     userId: string
 
-    constructor(user: UserDocument) {
-        this.userId = user._id.toString()
-        this.login = user.login
-        this.email = user.email
+    constructor(user: User) {
+        const userData = user.getPersistenceData()
+        this.userId = user.id
+        this.login = userData.login
+        this.email = userData.email
     }
 }

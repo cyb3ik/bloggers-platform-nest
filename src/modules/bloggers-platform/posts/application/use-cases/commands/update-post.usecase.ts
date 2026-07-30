@@ -36,9 +36,11 @@ export class UpdatePostUseCase
             throw new NotFoundException('Blog was not found')
         }
 
+        const blogData = blog.getPersistenceData()
+
         post.update({
             ...dto,
-            blogName: blog.name
+            blogName: blogData.name
         })
 
         await this.PostsRepository.save(post)

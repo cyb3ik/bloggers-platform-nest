@@ -6,7 +6,7 @@ import { NotFoundException } from '@nestjs/common';
 import { PostsQueryParams } from '../../../../posts/api/dto/posts.query.params-dto';
 import { LikesRepository } from '../../../../likes/repositories/likes-repository';
 import { BlogsRepository } from '../../../infrastructure/blogs.repository';
-import { LikeStatus } from '../../../../likes/dto/create-domain-like.dto';
+import { LikeStatus } from '../../../../likes/dto/like.raw-dto';
 
 export class FindAllPostsFromBlogQuery extends Query<PaginatedViewDto<PostViewDto[]>> {
     constructor(

@@ -32,12 +32,14 @@ export class CreatePostForBlogUseCase
             throw new NotFoundException('Blog not found')
         }
 
+        const blogData = blog.getPersistenceData()
+
         const post = this.PostModel.createInstance({
             title: dto.title,
             shortDescription: dto.shortDescription,
             content: dto.content,
             blogId: blogId,
-            blogName: blog.name
+            blogName: blogData.name
         })
 
         await this.PostsRepository.save(post)

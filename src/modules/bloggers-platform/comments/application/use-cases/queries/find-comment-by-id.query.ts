@@ -1,11 +1,10 @@
 import { Query } from '@nestjs/cqrs';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
-import { Types } from 'mongoose';
 import { NotFoundException } from '@nestjs/common';
 import { CommentViewDto } from '../../../api/dto/comments.view-dto';
 import { LikesRepository } from '../../../../likes/repositories/likes-repository';
-import { LikeStatus } from '../../../../likes/dto/create-domain-like.dto';
 import { CommentsQueryRepository } from '../../../infrastructure/comments.query.repository';
+import { LikeStatus } from '../../../../likes/dto/like.raw-dto';
 
 export class FindCommentByIdQuery extends Query<CommentViewDto> {
     constructor(

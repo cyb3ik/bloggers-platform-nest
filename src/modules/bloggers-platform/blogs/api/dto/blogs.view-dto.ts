@@ -1,4 +1,4 @@
-import { BlogDocument } from '../../domain/blog.entity';
+import { RawBlogData } from "../../domain/dto/blog.raw-dto"
 
 export class BlogViewDto {
     id: string
@@ -8,12 +8,12 @@ export class BlogViewDto {
     isMembership: boolean
     createdAt: Date
 
-    constructor(blog: BlogDocument) {
-        this.id = blog._id.toString()
-        this.name = blog.name
-        this.description = blog.description
-        this.websiteUrl = blog.websiteUrl
-        this.isMembership = blog.isMembership
-        this.createdAt = blog.createdAt
+    constructor(data: RawBlogData) {
+        this.id = data.id
+        this.name = data.name
+        this.description = data.description
+        this.websiteUrl = data.websiteUrl
+        this.isMembership = data.isMembership
+        this.createdAt = data.createdAt
     }
 }

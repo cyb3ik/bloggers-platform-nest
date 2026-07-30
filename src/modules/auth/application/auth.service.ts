@@ -4,8 +4,8 @@ import { BcryptService } from "../../users/application/bcrypt.service";
 import { MailService } from "./mail.service";
 import { randomUUID } from "crypto";
 import { LoginInputDto } from "../api/dto/login.input-dto";
-import { UserDocument } from "../../users/domain/user.entity";
 import { MePageView } from "../api/dto/view/me-page-view.dto";
+import { User } from "../../users/domain/user-domain.entity";
 
 export enum CodeType {
     emailConfirmation = "emailConfimation",
@@ -31,24 +31,28 @@ export class AuthService {
 
         const user = userByEmail || userByLogin
 
-        if (user.passwordHash !== await this.CryptoService.generateHash(dto.password, user.passwordSalt)) {
+        const userData = user.getPersistenceData()
+
+        if (userData.passwordHash !== await this.CryptoService.generateHash(dto.password, userData.passwordSalt)) {
             throw new UnauthorizedException()
         }
 
         return user
     }
 
-    async sendCodeViaEmail(user: UserDocument, options: { codeType: CodeType }) {
+    async sendCodeViaEmail(user: User, options: { codeType: CodeType }) {
         const code = randomUUID().toString()
+
+        const userData = user.getPersistenceData()
 
         switch (options.codeType) {
             case (CodeType.emailConfirmation):
                 user.setEmailConfirmationCode(code)
-                await this.MailService.sendEmail(user.email, code)
+                await this.MailService.sendEmail(userData.email, code)
                 break
             case (CodeType.recovery):
                 user.setPasswordRecoveryCode(code)
-                await this.MailService.sendRecoveryCode(user.email, code)
+                await this.MailService.sendRecoveryCode(userData.email, code)
                 break
         }
 
@@ -57,10 +61,12 @@ export class AuthService {
         return code
     }
 
-    async checkIfCodeIsValid(user: UserDocument, code: string, options: { codeType: CodeType }) {
+    async checkIfCodeIsValid(user: User, code: string, options: { codeType: CodeType }) {
+        const userData = user.getPersistenceData()
+
         switch (options.codeType) {
             case (CodeType.emailConfirmation):
-                if (code !== user.emailConfirmation.confirmationCode) {
+                if (code !== userData.emailConfirmation.confirmationCode) {
                     throw new BadRequestException(
                         [{
                             message: 'Code is wrong',
@@ -69,7 +75,7 @@ export class AuthService {
                     )
                 }
 
-                if (user.emailConfirmation.expirationDate < new Date()) {
+                if (userData.emailConfirmation.expirationDate < new Date()) {
                     throw new BadRequestException(
                         [{
                             message: 'Code has expired',
@@ -78,7 +84,7 @@ export class AuthService {
                     )
                 }
 
-                if (user.emailConfirmation.isConfirmed) {
+                if (userData.emailConfirmation.isConfirmed) {
                     throw new BadRequestException(
                         [{
                             message: 'Email already confirmed',
@@ -92,7 +98,7 @@ export class AuthService {
                 break
 
             case (CodeType.recovery):
-                if (code !== user.passwordRecovery.recoveryCode) {
+                if (code !== userData.passwordRecovery.recoveryCode) {
                     throw new BadRequestException(
                         {
                             message: 'Code is wrong',
@@ -101,7 +107,7 @@ export class AuthService {
                     )
                 }
 
-                if (user.passwordRecovery.expirationDate < new Date()) {
+                if (userData.passwordRecovery.expirationDate < new Date()) {
                     throw new BadRequestException({
                         message: 'Code has expired',
                         field: 'code',

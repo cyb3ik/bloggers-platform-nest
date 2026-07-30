@@ -37,9 +37,11 @@ export class OptionalAccessTokenAuthGuard implements CanActivate {
                 throw new UnauthorizedException()
             }
 
+            const userData = user.getPersistenceData()
+
             req.user = {
-                id: user._id,
-                login: user.login
+                id: user.id,
+                login: userData.login
             }
 
             return true

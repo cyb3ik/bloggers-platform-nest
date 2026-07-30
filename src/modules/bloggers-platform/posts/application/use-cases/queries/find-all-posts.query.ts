@@ -1,11 +1,10 @@
-import { IQueryHandler, Query, QueryBus, QueryHandler } from '@nestjs/cqrs';
+import { IQueryHandler, Query, QueryHandler } from '@nestjs/cqrs';
 import { PaginatedViewDto } from '../../../../../../core/dto/paginated.view-dto';
 import { PostViewDto } from '../../../api/dto/posts.view-dto';
 import { PostsQueryParams } from '../../../api/dto/posts.query.params-dto';
 import { PostsQueryRepository } from '../../../infrastructure/posts.query.repository';
-import { Types } from 'mongoose';
 import { LikesRepository } from '../../../../likes/repositories/likes-repository';
-import { LikeStatus } from '../../../../likes/dto/create-domain-like.dto';
+import { LikeStatus } from '../../../../likes/dto/like.raw-dto';
 
 export class FindAllPostsQuery extends Query<PaginatedViewDto<PostViewDto[]>> {
     constructor(

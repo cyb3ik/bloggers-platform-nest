@@ -20,7 +20,9 @@ export class ResendConfirmationCodeUseCase
 
         const user = await this.UsersRepository.findUserByEmail(email)
 
-        if (!user || user.emailConfirmation.isConfirmed) {
+        const userData = user.getPersistenceData()
+
+        if (!user || userData.emailConfirmation.isConfirmed) {
             throw new BadRequestException(
                 [{
                     message: 'Email already confirmed',

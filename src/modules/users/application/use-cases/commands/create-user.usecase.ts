@@ -3,8 +3,8 @@ import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
 import { UsersService } from "../../users.service";
 import { UsersRepository } from "../../../infrastructure/users.repository";
 import { UsersConfig } from "../../../users.config";
-import { InjectModel } from "@nestjs/mongoose";
-import { User, type UserModelType } from "../../../domain/user.entity";
+import { User } from "../../../domain/user-domain.entity";
+import { randomUUID } from "crypto";
 
 
 export class CreateUserCommand {
@@ -15,8 +15,6 @@ export class CreateUserCommand {
 export class CreateUserUseCase
     implements ICommandHandler<CreateUserCommand> {
     constructor(
-        @InjectModel(User.name)
-        private readonly UserModel: UserModelType,
         private readonly UsersService: UsersService,
         private readonly UsersRepository: UsersRepository,
         private readonly UsersConfig: UsersConfig
@@ -29,17 +27,19 @@ export class CreateUserUseCase
         const passwordInfo = await this.UsersService.generatePasswordHashAndSalt(dto.password)
 
         const userDomainDto = {
+            id: randomUUID().toString(),
             email: dto.email,
             login: dto.login,
             passwordSalt: passwordInfo.passwordSalt,
             passwordHash: passwordInfo.passwordHash,
-            isConfirmed: this.UsersConfig.isUserAutoConfirmed
+            isConfirmed: this.UsersConfig.isUserAutoConfirmed,
+            createdAt: new Date()
         }
 
-        const user = this.UserModel.createInstance(userDomainDto)
+        const user = new User(userDomainDto)
 
         await this.UsersRepository.save(user)
 
-        return user._id.toString()
+        return user.id
     }
 }

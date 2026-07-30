@@ -1,14 +1,12 @@
 import { IQueryHandler, Query, QueryHandler } from '@nestjs/cqrs';
 import { PaginatedViewDto } from '../../../../../../core/dto/paginated.view-dto';
-import { PostsQueryRepository } from '../../../../posts/infrastructure/posts.query.repository';
-import { Types } from 'mongoose';
 import { NotFoundException } from '@nestjs/common';
 import { CommentsQueryRepository } from '../../../../comments/infrastructure/comments.query.repository';
 import { CommentViewDto } from '../../../../comments/api/dto/comments.view-dto';
 import { CommentsQueryParams } from '../../../../comments/api/dto/comments.query.params-dto';
 import { LikesRepository } from '../../../../likes/repositories/likes-repository';
-import { LikeStatus } from '../../../../likes/dto/create-domain-like.dto';
 import { PostsRepository } from '../../../infrastructure/posts.repository';
+import { LikeStatus } from '../../../../likes/dto/like.raw-dto';
 
 export class FindAllCommentsFromPostQuery extends Query<PaginatedViewDto<CommentViewDto[]>> {
     constructor(

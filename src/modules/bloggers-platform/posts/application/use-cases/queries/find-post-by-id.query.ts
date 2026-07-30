@@ -1,11 +1,10 @@
 import { Query } from '@nestjs/cqrs';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
-import { Types } from 'mongoose';
 import { NotFoundException } from '@nestjs/common';
 import { PostsQueryRepository } from '../../../infrastructure/posts.query.repository';
 import { PostViewDto } from '../../../api/dto/posts.view-dto';
 import { LikesRepository } from '../../../../likes/repositories/likes-repository';
-import { LikeStatus } from '../../../../likes/dto/create-domain-like.dto';
+import { LikeStatus } from '../../../../likes/dto/like.raw-dto';
 
 export class FindPostByIdQuery extends Query<PostViewDto> {
     constructor(

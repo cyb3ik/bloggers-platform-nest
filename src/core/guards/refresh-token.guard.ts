@@ -40,7 +40,7 @@ export class RefreshTokenGuard implements CanActivate {
             }
 
             req.session = {
-                userId: user._id.toString(),
+                userId: user.id,
                 deviceId: payload.deviceId
             }
 

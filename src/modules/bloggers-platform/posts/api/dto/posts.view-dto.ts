@@ -1,5 +1,5 @@
-import { LikeStatus } from '../../../likes/dto/create-domain-like.dto';
 import { LikeViewDto } from '../../../likes/dto/like-view.dto';
+import { LikeStatus } from '../../../likes/dto/like.raw-dto';
 import { PostDocument } from '../../domain/post.entity';
 
 export class PostViewDto {

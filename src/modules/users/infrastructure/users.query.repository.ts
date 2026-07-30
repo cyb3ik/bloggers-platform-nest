@@ -1,27 +1,29 @@
 import { InjectModel } from '@nestjs/mongoose';
-import { User } from '../domain/user.entity';
 import { Injectable } from '@nestjs/common';
-import type { UserModelType } from '../domain/user.entity';
 import { UserViewDto } from '../api/dto/users.view-dto';
 import { UsersQueryParams } from '../api/dto/users.query.params-dto';
 import { PaginatedViewDto } from '../../../core/dto/paginated.view-dto';
 import { BaseQueryRepository } from '../../../core/interfaces/repositories/query-repository.interface';
+import { RawUserData } from '../domain/dto/user.raw-dto';
+import { MongoUser, type UserModelType } from '../domain/user-mongoose.entity';
 
 @Injectable()
 export class UsersQueryRepository implements BaseQueryRepository<UserViewDto, UsersQueryParams> {
-    constructor(@InjectModel(User.name) private readonly UserModel: UserModelType) { }
+    constructor(@InjectModel(MongoUser.name) private readonly UserModel: UserModelType) { }
 
     async getEntityById(id: string): Promise<UserViewDto | null> {
-        const user = await this.UserModel.findOne({
+        const userDocument = await this.UserModel.findOne({
             _id: id,
             deletedAt: null,
-        })
+        }).lean()
 
-        if (!user) {
+        if (!userDocument) {
             return null
         }
 
-        return new UserViewDto(user)
+        const userData = RawUserData.createFromDocument(userDocument)
+
+        return new UserViewDto(userData)
     }
 
     async getAllEntities(query: UsersQueryParams): Promise<PaginatedViewDto<UserViewDto[]>> {
@@ -54,7 +56,11 @@ export class UsersQueryRepository implements BaseQueryRepository<UserViewDto, Us
         const totalCount = await this.UserModel.countDocuments(filter)
 
         return PaginatedViewDto.mapToView({
-            items: result.map(user => new UserViewDto(user)),
+            items: result.map(userDocument => {
+                const userData = RawUserData.createFromDocument(userDocument)
+
+                return new UserViewDto(userData)
+            }),
             page: pageNumber,
             size: pageSize,
             totalCount: totalCount

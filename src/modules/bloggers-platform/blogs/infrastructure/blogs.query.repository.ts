@@ -1,28 +1,31 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-import { Blog } from "../domain/blog.entity";
-import type { BlogModelType } from "../domain/blog.entity";
+import { MongoBlog } from "../domain/blog-mongoose.entity";
+import type { BlogModelType } from "../domain/blog-mongoose.entity";
 import { BlogViewDto } from "../api/dto/blogs.view-dto";
 import { BlogsQueryParams } from "../api/dto/blogs.query.params-dto";
 import { PaginatedViewDto } from "../../../../core/dto/paginated.view-dto";
 import { BaseQueryRepository } from "../../../../core/interfaces/repositories/query-repository.interface";
+import { RawBlogData } from "../domain/dto/blog.raw-dto";
 
 
 @Injectable()
 export class BlogsQueryRepository implements BaseQueryRepository<BlogViewDto, BlogsQueryParams> {
-    constructor(@InjectModel(Blog.name) private readonly BlogModel: BlogModelType) { }
+    constructor(@InjectModel(MongoBlog.name) private readonly BlogModel: BlogModelType) { }
 
     async getEntityById(id: string): Promise<BlogViewDto | null> {
-        const blog = await this.BlogModel.findOne({
+        const blogDocument = await this.BlogModel.findOne({
             _id: id,
             deletedAt: null,
-        })
+        }).lean()
 
-        if (!blog) {
+        if (!blogDocument) {
             return null
         }
 
-        return new BlogViewDto(blog)
+        const blogData = RawBlogData.createFromDocument(blogDocument)
+
+        return new BlogViewDto(blogData)
     }
 
     async getAllEntities(query: BlogsQueryParams): Promise<PaginatedViewDto<BlogViewDto[]>> {
@@ -43,12 +46,16 @@ export class BlogsQueryRepository implements BaseQueryRepository<BlogViewDto, Bl
             .sort({ [sortBy]: sortDirection })
             .skip(skip)
             .limit(pageSize)
-            .exec()
+            .lean()
 
         const totalCount = await this.BlogModel.countDocuments(filter)
 
         return PaginatedViewDto.mapToView({
-            items: result.map(blog => new BlogViewDto(blog)),
+            items: result.map(blogDocument => {
+                const blogData = RawBlogData.createFromDocument(blogDocument)
+
+                return new BlogViewDto(blogData)
+            }),
             page: pageNumber,
             size: pageSize,
             totalCount: totalCount
