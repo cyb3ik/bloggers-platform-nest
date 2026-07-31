@@ -1,12 +1,12 @@
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs"
 import { ChangeLikeStatusInputDto } from "../../../../likes/dto/change-like-status-input.dto"
 import { CommentsRepository } from "../../../infrastructure/comments.repository"
-import { LikesRepository } from "../../../../likes/repositories/likes-repository"
 import { NotFoundException } from "@nestjs/common"
 import { UserInfo } from "../../../../../users/api/dto/user-info.dto"
 import { LikeStatus } from "../../../../likes/dto/like.raw-dto"
 import { Like } from "../../../../likes/domain/like-domain.entity"
 import { randomUUID } from "crypto"
+import { LikesRepository } from "../../../../likes/repositories/likes.repository"
 
 export class ChangeLikeStatusOnCommentCommand {
     constructor(

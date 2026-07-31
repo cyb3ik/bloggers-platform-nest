@@ -1,8 +1,6 @@
 import { Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
 import { MongoBlog, BlogSchema } from "./blogs/domain/blog-mongoose.entity";
-import { Post, PostSchema } from "./posts/domain/post.entity";
-import { Comment, CommentSchema } from "./comments/domain/comment.entity";
 import { BlogsService } from "./blogs/application/blogs.service";
 import { BlogsRepository } from "./blogs/infrastructure/blogs.repository";
 import { BlogsQueryRepository } from "./blogs/infrastructure/blogs.query.repository";
@@ -32,12 +30,15 @@ import { DeleteCommentUseCase } from "./comments/application/use-cases/commands/
 import { ACCESS_TOKEN_STRATEGY_INJECT_TOKEN } from "../../core/constants/jwt-tokens";
 import { JwtService } from "@nestjs/jwt";
 import { UsersModule } from "../users/users.module";
-import { LikesRepository } from "./likes/repositories/likes-repository";
 import { FindAllPostsQueryHandler } from "./posts/application/use-cases/queries/find-all-posts.query";
 import { ChangeLikeStatusOnCommentUseCase } from "./comments/application/use-cases/commands/change-like-status-on-comment.usecase";
 import { CreateCommentForPostUseCase } from "./posts/application/use-cases/commands/create-comment-for-post.usecase";
 import { ChangeLikeStatusOnPostUseCase } from "./posts/application/use-cases/commands/change-like-status-on-post.usecase";
 import { LikeSchema, MongoLike } from "./likes/domain/like-mongoose.entity";
+import { LikesRepository } from "./likes/repositories/likes.repository";
+import { LikesQueryRepository } from "./likes/repositories/likes.query.repository";
+import { MongoPost, PostSchema } from "./posts/domain/post-mongoose.entity";
+import { CommentSchema, MongoComment } from "./comments/domain/comment-mongoose.entity";
 
 const blogsCommands = [
     CreateBlogUseCase,
@@ -78,8 +79,8 @@ const queryHandlers = [...blogsQueries, ...postsQueries, ...commentsQueries]
 @Module({
     imports: [MongooseModule.forFeature([
         { name: MongoBlog.name, schema: BlogSchema },
-        { name: Post.name, schema: PostSchema },
-        { name: Comment.name, schema: CommentSchema },
+        { name: MongoPost.name, schema: PostSchema },
+        { name: MongoComment.name, schema: CommentSchema },
         { name: MongoLike.name, schema: LikeSchema }
     ]),
         UsersModule],
@@ -104,7 +105,8 @@ const queryHandlers = [...blogsQueries, ...postsQueries, ...commentsQueries]
                 })
             }
         },
-        LikesRepository
+        LikesRepository,
+        LikesQueryRepository
     ],
     controllers: [
         BlogsController,

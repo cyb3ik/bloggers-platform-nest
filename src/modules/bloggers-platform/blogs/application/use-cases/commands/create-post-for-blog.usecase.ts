@@ -1,10 +1,10 @@
-import { InjectModel } from "@nestjs/mongoose";
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
 import { BlogsRepository } from "../../../infrastructure/blogs.repository";
 import { CreatePostForBlogInputDto } from "../../../../posts/api/dto/posts.input-dto";
-import { Post, type PostModelType } from "../../../../posts/domain/post.entity";
 import { PostsRepository } from "../../../../posts/infrastructure/posts.repository";
 import { NotFoundException } from "@nestjs/common";
+import { randomUUID } from "crypto";
+import { Post } from "../../../../posts/domain/post-domain.entity";
 
 
 export class CreatePostForBlogCommand {
@@ -18,8 +18,6 @@ export class CreatePostForBlogCommand {
 export class CreatePostForBlogUseCase
     implements ICommandHandler<CreatePostForBlogCommand> {
     constructor(
-        @InjectModel(Post.name)
-        private readonly PostModel: PostModelType,
         private readonly BlogsRepository: BlogsRepository,
         private readonly PostsRepository: PostsRepository,
     ) { }
@@ -34,16 +32,20 @@ export class CreatePostForBlogUseCase
 
         const blogData = blog.getPersistenceData()
 
-        const post = this.PostModel.createInstance({
+        const postDomainDto = {
+            id: randomUUID().toString(),
             title: dto.title,
             shortDescription: dto.shortDescription,
             content: dto.content,
             blogId: blogId,
-            blogName: blogData.name
-        })
+            blogName: blogData.name,
+            createdAt: new Date()
+        }
+
+        const post = new Post(postDomainDto)
 
         await this.PostsRepository.save(post)
 
-        return post._id.toString()
+        return post.id
     }
 }

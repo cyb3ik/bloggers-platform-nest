@@ -1,6 +1,13 @@
 import { LikeViewDto } from '../../../likes/dto/like-view.dto';
 import { LikeStatus } from '../../../likes/dto/like.raw-dto';
-import { PostDocument } from '../../domain/post.entity';
+import { RawPostData } from '../../domain/dto/posts.raw-dto';
+
+export class ExtendedPostLikesInfo {
+    likesCount: number
+    dislikesCount: number
+    myStatus: LikeStatus
+    newestLikes: LikeViewDto[]
+}
 
 export class PostViewDto {
     id: string
@@ -10,28 +17,21 @@ export class PostViewDto {
     blogId: string
     blogName: string
     createdAt: Date
-    extendedLikesInfo: {
-        likesCount: number
-        dislikesCount: number
-        myStatus: LikeStatus
-        newestLikes: LikeViewDto[]
-    }
-    constructor(post: PostDocument) {
-        this.id = post._id.toString()
-        this.title = post.title
-        this.shortDescription = post.shortDescription
-        this.content = post.content
-        this.blogId = post.blogId
-        this.blogName = post.blogName
-        this.createdAt = post.createdAt
-    }
+    extendedLikesInfo: ExtendedPostLikesInfo
 
-    addLikesInfo(likesCount: number, dislikesCount: number, likeStatus: LikeStatus, newestLikes: LikeViewDto[]) {
+    constructor(data: RawPostData, likesInfo: ExtendedPostLikesInfo) {
+        this.id = data.id
+        this.title = data.title
+        this.shortDescription = data.shortDescription
+        this.content = data.content
+        this.blogId = data.blogId
+        this.blogName = data.blogName
+        this.createdAt = data.createdAt
         this.extendedLikesInfo = {
-            likesCount: likesCount,
-            dislikesCount: dislikesCount,
-            myStatus: likeStatus,
-            newestLikes: newestLikes
+            likesCount: likesInfo.likesCount,
+            dislikesCount: likesInfo.dislikesCount,
+            myStatus: likesInfo.myStatus,
+            newestLikes: likesInfo.newestLikes
         }
     }
 }

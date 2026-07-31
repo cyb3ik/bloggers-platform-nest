@@ -1,29 +1,32 @@
 import { LikeStatus } from '../../../likes/dto/like.raw-dto';
-import { CommentatorInfo, CommentDocument } from '../../domain/comment.entity';
+import { CommentatorInfo } from '../../domain/comment-domain.entity';
+import { RawCommentData } from '../../domain/dto/comment.raw-dto';
+
+export class CommentLikesInfo {
+    likesCount: number
+    dislikesCount: number
+    myStatus: LikeStatus
+}
 
 export class CommentViewDto {
     id: string
     content: string
     commentatorInfo: CommentatorInfo
     createdAt: Date
-    likesInfo: {
-        likesCount: number,
-        dislikesCount: number,
-        likeStatus: LikeStatus
-    }
+    likesInfo: CommentLikesInfo
 
-    constructor(comment: CommentDocument) {
-        this.id = comment._id.toString()
-        this.content = comment.content
-        this.commentatorInfo = comment.commentatorInfo
-        this.createdAt = comment.createdAt
-    }
-
-    addLikesInfo(likesCount: number, dislikesCount: number, likeStatus: LikeStatus) {
+    constructor(data: RawCommentData, likesInfo: CommentLikesInfo) {
+        this.id = data.id
+        this.content = data.content
+        this.commentatorInfo = {
+            userId: data.userId,
+            userLogin: data.userLogin
+        }
+        this.createdAt = data.createdAt
         this.likesInfo = {
-            likesCount: likesCount,
-            dislikesCount: dislikesCount,
-            likeStatus: likeStatus
+            likesCount: likesInfo.likesCount,
+            dislikesCount: likesInfo.dislikesCount,
+            myStatus: likesInfo.myStatus
         }
     }
 }

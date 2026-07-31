@@ -1,5 +1,4 @@
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
-import { Types } from "mongoose";
 import { NotFoundException } from "@nestjs/common";
 import { PostsRepository } from "../../../infrastructure/posts.repository";
 

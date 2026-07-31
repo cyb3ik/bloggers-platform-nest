@@ -2,7 +2,6 @@ import { Query } from '@nestjs/cqrs';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { NotFoundException } from '@nestjs/common';
 import { CommentViewDto } from '../../../api/dto/comments.view-dto';
-import { LikesRepository } from '../../../../likes/repositories/likes-repository';
 import { CommentsQueryRepository } from '../../../infrastructure/comments.query.repository';
 import { LikeStatus } from '../../../../likes/dto/like.raw-dto';
 
@@ -18,32 +17,17 @@ export class FindCommentByIdQuery extends Query<CommentViewDto> {
 @QueryHandler(FindCommentByIdQuery)
 export class FindCommentByIdQueryHandler implements IQueryHandler<FindCommentByIdQuery> {
     constructor(
-        private readonly CommentsQueryRepository: CommentsQueryRepository,
-        private readonly LikesRepository: LikesRepository
+        private readonly CommentsQueryRepository: CommentsQueryRepository
     ) { }
 
     async execute(query: FindCommentByIdQuery): Promise<CommentViewDto> {
         const comment = await this.CommentsQueryRepository.getEntityById(
-            query.commentId
+            query.commentId, query.userId
         )
 
         if (!comment) {
             throw new NotFoundException('Comment not found')
         }
-
-        let status = LikeStatus.None
-
-        if (query.userId) {
-            const like = await this.LikesRepository.findLikeByUserId(comment.id, query.userId)
-
-            if (like) {
-                status = like.status
-            }
-        }
-
-        const { likesCount, dislikesCount } = await this.LikesRepository.getLikesAndDislikesCount(comment.id)
-
-        comment.addLikesInfo(likesCount, dislikesCount, status)
 
         return comment
     }

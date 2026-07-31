@@ -24,7 +24,9 @@ export class DeleteCommentUseCase
             throw new NotFoundException('Comment was not found')
         }
 
-        if (comment.commentatorInfo.userId.toString() !== userId.toString()) {
+        const commentData = comment.getPersistenceData()
+
+        if (commentData.commentatorInfo.userId !== userId) {
             throw new ForbiddenException()
         }
 

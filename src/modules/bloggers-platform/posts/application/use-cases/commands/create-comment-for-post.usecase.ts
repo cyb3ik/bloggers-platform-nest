@@ -1,12 +1,12 @@
 import { InjectModel } from "@nestjs/mongoose";
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
-import { Types } from "mongoose";
 import { PostsRepository } from "../../../../posts/infrastructure/posts.repository";
 import { NotFoundException } from "@nestjs/common";
-import { Comment, type CommentModelType } from "../../../../comments/domain/comment.entity";
 import { CommentsRepository } from "../../../../comments/infrastructure/comments.repository";
 import { CreateCommentInputDto } from "../../../../comments/api/dto/comments.input-dto";
 import { UserInfo } from "../../../../../users/api/dto/user-info.dto";
+import { randomUUID } from "crypto";
+import { Comment } from "../../../../comments/domain/comment-domain.entity";
 
 
 export class CreateCommentForPostCommand {
@@ -21,8 +21,6 @@ export class CreateCommentForPostCommand {
 export class CreateCommentForPostUseCase
     implements ICommandHandler<CreateCommentForPostCommand> {
     constructor(
-        @InjectModel(Comment.name)
-        private readonly CommentModel: CommentModelType,
         private readonly CommentsRepository: CommentsRepository,
         private readonly PostsRepository: PostsRepository,
     ) { }
@@ -35,17 +33,19 @@ export class CreateCommentForPostUseCase
             throw new NotFoundException('Post not found')
         }
 
-        const comment = this.CommentModel.createInstance({
+        const commentDomainDto = {
+            id: randomUUID().toString(),
             content: dto.content,
-            commentatorInfo: {
-                userId: user.id,
-                userLogin: user.login
-            },
-            postId: postId
-        })
+            userId: user.id,
+            userLogin: user.login,
+            postId: postId,
+            createdAt: new Date()
+        }
+
+        const comment = new Comment(commentDomainDto)
 
         await this.CommentsRepository.save(comment)
 
-        return comment._id.toString()
+        return comment.id
     }
 }

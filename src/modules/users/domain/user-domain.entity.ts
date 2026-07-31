@@ -54,6 +54,7 @@ export class User {
             email: this.email,
             emailConfirmation: this.emailConfirmation,
             passwordRecovery: this.passwordRecovery,
+            createdAt: this.createdAt,
             deletedAt: this.deletedAt
         }
     }

@@ -1,6 +1,5 @@
 import { PostsQueryParams } from "../../../../modules/bloggers-platform/posts/api/dto/posts.query.params-dto";
 import { PostViewDto } from "../../../../modules/bloggers-platform/posts/api/dto/posts.view-dto";
-import { PostDocument } from "../../../../modules/bloggers-platform/posts/domain/post.entity";
 import { PaginatedViewDto } from "../../../dto/paginated.view-dto";
 import { BaseQueryRepository } from "../query-repository.interface";
 

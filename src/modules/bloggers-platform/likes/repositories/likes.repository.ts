@@ -52,38 +52,4 @@ export class LikesRepository implements ILikesRepository {
 
         return new Like(likeData)
     }
-
-
-    async getNewestLikesFromEntity(entityId: string): Promise<LikeViewDto[]> {
-        const items = await this.LikeModel
-            .find(
-                {
-                    entityId: entityId,
-                    status: "Like"
-                }
-            )
-            .sort({ createdAt: -1 })
-            .lean()
-
-        return items.map(likeDocument => {
-            const likeData = RawLikeData.createFromDocument(likeDocument)
-
-            return new LikeViewDto(likeData)
-        })
-            .slice(0, 3)
-    }
-
-    async getLikesAndDislikesCount(entityId: string): Promise<{ likesCount: number, dislikesCount: number }> {
-        const likesCount = await this.LikeModel.countDocuments({
-            entityId: entityId,
-            status: "Like"
-        })
-
-        const dislikesCount = await this.LikeModel.countDocuments({
-            entityId: entityId,
-            status: "Dislike"
-        })
-
-        return { likesCount: likesCount, dislikesCount: dislikesCount }
-    }
 }

@@ -4,8 +4,4 @@ import { BaseRepository } from "../base-repository.interface";
 
 export interface ILikesRepository extends BaseRepository<Like> {
     findLikeByUserId(entityId: string, userId: string): Promise<Like | null>
-
-    getNewestLikesFromEntity(entityId: string): Promise<LikeViewDto[]>
-
-    getLikesAndDislikesCount(entityId: string): Promise<{ likesCount: number, dislikesCount: number }>
 }

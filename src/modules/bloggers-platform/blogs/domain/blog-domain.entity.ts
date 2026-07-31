@@ -25,6 +25,7 @@ export class Blog {
             description: this.description,
             websiteUrl: this.websiteUrl,
             isMembership: this.isMembership,
+            createdAt: this.createdAt,
             deletedAt: this.deletedAt
         }
     }
