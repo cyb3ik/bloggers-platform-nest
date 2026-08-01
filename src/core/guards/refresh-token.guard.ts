@@ -2,7 +2,7 @@ import { CanActivate, ExecutionContext, ForbiddenException, Inject, Injectable, 
 import { JwtService } from "@nestjs/jwt";
 import { UsersRepository } from "../../modules/users/infrastructure/users.repository";
 import { REFRESH_TOKEN_STRATEGY_INJECT_TOKEN } from "../constants/jwt-tokens";
-import { SessionsRepository } from "../../modules/sessions/sessions.repository";
+import { SessionsRepository } from "../../modules/sessions/infrastructure/sessions.repository";
 
 @Injectable()
 export class RefreshTokenGuard implements CanActivate {

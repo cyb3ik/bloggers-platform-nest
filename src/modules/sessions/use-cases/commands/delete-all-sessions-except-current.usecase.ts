@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
 import { SessionInfo } from "../../dto/session-info.dto";
-import { SessionsRepository } from "../../sessions.repository";
+import { SessionsRepository } from "../../infrastructure/sessions.repository";
 
 export class DeleteAllSessionExceptCurrentCommand {
     constructor(

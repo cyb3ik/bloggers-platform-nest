@@ -6,10 +6,8 @@ import { Request, Response } from "express";
 import { Inject } from "@nestjs/common";
 import { ACCESS_TOKEN_STRATEGY_INJECT_TOKEN, REFRESH_TOKEN_STRATEGY_INJECT_TOKEN } from "../../../../../core/constants/jwt-tokens";
 import { randomUUID } from "crypto";
-import { InjectModel } from "@nestjs/mongoose";
-import { Session, type SessionModelType } from "../../../../sessions/session.entity";
-import { CreateSessionDto } from "../../../../sessions/dto/create-session.dto";
-import { SessionsRepository } from "../../../../sessions/sessions.repository";
+import { Session } from "../../../../sessions/domain/session-domain.entity";
+import { SessionsRepository } from "../../../../sessions/infrastructure/sessions.repository";
 
 
 export class LoginUserCommand {
@@ -24,8 +22,6 @@ export class LoginUserCommand {
 export class LoginUserUseCase
     implements ICommandHandler<LoginUserCommand> {
     constructor(
-        @InjectModel(Session.name)
-        private readonly SessionModel: SessionModelType,
         @Inject(ACCESS_TOKEN_STRATEGY_INJECT_TOKEN)
         private readonly AccessTokenService: JwtService,
 
@@ -50,7 +46,8 @@ export class LoginUserUseCase
 
         const refreshTokenPayload = await this.RefreshTokenService.verify(refreshToken)
 
-        const newSession: CreateSessionDto = {
+        const sessionDomainDto = {
+            id: randomUUID().toString(),
             ip: req.ip!,
             title: req.headers["user-agent"] || "Device",
             lastActiveDate: refreshTokenPayload.iat!.toString(),
@@ -59,7 +56,7 @@ export class LoginUserUseCase
             exp: refreshTokenPayload.exp!.toString()
         }
 
-        const session = this.SessionModel.createInstance(newSession)
+        const session = new Session(sessionDomainDto)
 
         await this.SessionsRepository.save(session)
 

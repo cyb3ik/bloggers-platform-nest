@@ -1,30 +1,39 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-import { Request, RequestDocument, type RequestModelType } from "./request.entity";
-import { add } from "date-fns/add";
+import { MongoRequest, type RequestModelType } from "./entity/request-mongoose.entity";
+import { Request } from "./entity/request-domain.entity";
+import { BaseRepository } from "../interfaces/repositories/base-repository.interface";
 
 @Injectable()
-export class RequestsRepository {
+export class RequestsRepository implements BaseRepository<Request> {
     constructor(
-        @InjectModel(Request.name) private readonly RequestModel: RequestModelType
+        @InjectModel(MongoRequest.name) private readonly RequestModel: RequestModelType
     ) { }
 
-    async getRequestsRate(ip: string, url: string, date: Date) {
-        const rate = await this.RequestModel.countDocuments({
-            ip: ip,
-            url: url,
-            date: {
-                $gte: add(date, {
-                    seconds: -10
-                })
-            }
-        })
-        return rate
+    async save(req: Request) {
+        const data = req.getPersistenceData()
+
+        await this.RequestModel.updateOne(
+            { _id: req.id },
+            { $set: data },
+            { upsert: true }
+        )
     }
 
-    async saveNewRequest(dto: { ip: string, url: string, date: Date }) {
-        const req = this.RequestModel.createInstance(dto)
+    async findEntityById(id: string): Promise<Request | null> {
+        const requestDocument = await this.RequestModel.findOne({
+            _id: id
+        })
 
-        await req.save()
+        if (!requestDocument) {
+            return null
+        }
+
+        return new Request({
+            id: requestDocument._id,
+            ip: requestDocument.ip,
+            url: requestDocument.url,
+            date: requestDocument.date
+        })
     }
 }

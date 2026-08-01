@@ -1,4 +1,4 @@
-import { SessionDocument } from '../session.entity';
+import { RawSessionData } from "./session.raw-dto"
 
 export class SessionViewDto {
     ip: string
@@ -6,10 +6,10 @@ export class SessionViewDto {
     lastActiveDate: string
     deviceId: string
 
-    constructor(session: SessionDocument) {
-        this.ip = session.ip
-        this.title = session.title
-        this.lastActiveDate = new Date(Number(session.lastActiveDate) * 1000).toISOString()
-        this.deviceId = session.deviceId
+    constructor(data: RawSessionData) {
+        this.ip = data.ip
+        this.title = data.title
+        this.lastActiveDate = new Date(Number(data.lastActiveDate) * 1000).toISOString()
+        this.deviceId = data.deviceId
     }
 }

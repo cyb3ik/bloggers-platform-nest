@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
-import { SessionsRepository } from "../../../../sessions/sessions.repository";
 import { SessionInfo } from "../../../../sessions/dto/session-info.dto";
+import { SessionsRepository } from "../../../../sessions/infrastructure/sessions.repository";
 
 
 export class LogoutCommand {

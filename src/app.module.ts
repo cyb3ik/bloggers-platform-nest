@@ -9,12 +9,12 @@ import { TestingModule } from './modules/testing/testing.module';
 import { APP_GUARD } from '@nestjs/core';
 import { SaveReqInfoGuard } from './core/guards/save-req-info.guard';
 import { RequestsRepository } from './core/requests/requests.repository';
-import { Request, RequestSchema } from './core/requests/request.entity';
+import { MongoRequest, RequestSchema } from './core/requests/entity/request-mongoose.entity';
 
 @Module({
   imports: [
     MongooseModule.forRoot(process.env.MONGO_URI),
-    MongooseModule.forFeature([{ name: Request.name, schema: RequestSchema }]),
+    MongooseModule.forFeature([{ name: MongoRequest.name, schema: RequestSchema }]),
     configModule,
     ...(process.env.INCLUDE_TESTING_MODULE ? [TestingModule] : []),
     UsersModule,

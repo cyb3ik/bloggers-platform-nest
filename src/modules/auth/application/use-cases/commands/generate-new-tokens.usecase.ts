@@ -3,8 +3,8 @@ import { JwtService } from "@nestjs/jwt";
 import { Response } from "express";
 import { Inject } from "@nestjs/common";
 import { ACCESS_TOKEN_STRATEGY_INJECT_TOKEN, REFRESH_TOKEN_STRATEGY_INJECT_TOKEN } from "../../../../../core/constants/jwt-tokens";
-import { SessionsRepository } from "../../../../sessions/sessions.repository";
 import { SessionInfo } from "../../../../sessions/dto/session-info.dto";
+import { SessionsRepository } from "../../../../sessions/infrastructure/sessions.repository";
 
 
 export class GenerateNewTokensCommand {
@@ -38,7 +38,11 @@ export class GenerateNewTokensUseCase
 
         const refreshTokenPayload = await this.RefreshTokenService.verify(refreshToken)
 
-        await this.SessionsRepository.updateSessionInformation(userId, deviceId, refreshTokenPayload.iat)
+        const currentSession = await this.SessionsRepository.findSessionByDeviceAndUserId(userId, deviceId)
+
+        currentSession.update(refreshTokenPayload.iat)
+
+        await this.SessionsRepository.save(currentSession)
 
         res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true })
 

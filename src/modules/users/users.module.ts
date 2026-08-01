@@ -24,10 +24,7 @@ import { AuthService } from '../auth/application/auth.service';
 import { ACCESS_TOKEN_STRATEGY_INJECT_TOKEN, REFRESH_TOKEN_STRATEGY_INJECT_TOKEN } from '../../core/constants/jwt-tokens';
 import { CoreConfig } from '../../core/core.config';
 import { UsersConfig } from './users.config';
-import { Request, RequestSchema } from '../../core/requests/request.entity';
 import { RequestsRepository } from '../../core/requests/requests.repository';
-import { SessionsRepository } from '../sessions/sessions.repository';
-import { Session, SessionSchema } from '../sessions/session.entity';
 import { GenerateNewTokensUseCase } from '../auth/application/use-cases/commands/generate-new-tokens.usecase';
 import { LogoutUseCase } from '../auth/application/use-cases/commands/logout.usecase';
 import { SecurityDevicesController } from '../sessions/api/security-devices.controller';
@@ -35,6 +32,11 @@ import { FindAllUserSessionsQueryHandler } from '../sessions/use-cases/queries/f
 import { DeleteAllSessionExceptCurrentUseCase } from '../sessions/use-cases/commands/delete-all-sessions-except-current.usecase';
 import { DeleteSpecifiedSessionUseCase } from '../sessions/use-cases/commands/delete-specified-session.usecase';
 import { MongoUser, UserSchema } from './domain/user-mongoose.entity';
+import { RequestsQueryRepository } from '../../core/requests/requests.query.repository';
+import { MongoRequest, RequestSchema } from '../../core/requests/entity/request-mongoose.entity';
+import { MongoSession, SessionSchema } from '../sessions/domain/session-mongoose.entity';
+import { SessionsRepository } from '../sessions/infrastructure/sessions.repository';
+import { SessionsQueryRepository } from '../sessions/infrastructure/sessions.query.repository';
 
 const queryHandlers = [
   FindUserByIdQueryHandler,
@@ -61,8 +63,8 @@ const commandHandlers = [
   imports: [
     MongooseModule.forFeature([
       { name: MongoUser.name, schema: UserSchema },
-      { name: Request.name, schema: RequestSchema },
-      { name: Session.name, schema: SessionSchema }
+      { name: MongoRequest.name, schema: RequestSchema },
+      { name: MongoSession.name, schema: SessionSchema }
     ]),
     JwtModule,
     CqrsModule.forRoot()
@@ -108,7 +110,9 @@ const commandHandlers = [
     UsersConfig,
     CoreConfig,
     RequestsRepository,
-    SessionsRepository
+    RequestsQueryRepository,
+    SessionsRepository,
+    SessionsQueryRepository
   ],
   exports: [
     UsersService,

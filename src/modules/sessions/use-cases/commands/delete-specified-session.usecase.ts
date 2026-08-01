@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
 import { SessionInfo } from "../../dto/session-info.dto";
-import { SessionsRepository } from "../../sessions.repository";
 import { ForbiddenException, NotFoundException } from "@nestjs/common";
+import { SessionsRepository } from "../../infrastructure/sessions.repository";
 
 export class DeleteSpecifiedSessionCommand {
     constructor(
@@ -27,7 +27,9 @@ export class DeleteSpecifiedSessionUseCase
             throw new NotFoundException('Session was not found')
         }
 
-        if (session.userId !== userId) {
+        const sessionData = session.getPersistenceData()
+
+        if (sessionData.userId !== userId) {
             throw new ForbiddenException()
         }
 
