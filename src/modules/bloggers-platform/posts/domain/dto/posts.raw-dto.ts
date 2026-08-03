@@ -11,7 +11,7 @@ export class RawPostData {
         const data = new this()
 
         data.id = document._id.toString()
-        data.title = document.name
+        data.title = document.title
         data.shortDescription = document.shortDescription
         data.content = document.content
         data.blogId = document.blogId

@@ -1,4 +1,4 @@
-import { IsMongoId, IsNotEmpty, IsString, Length } from "class-validator"
+import { IsMongoId, IsNotEmpty, IsString, IsUUID, Length } from "class-validator"
 import { Trim } from "../../../../../core/decorators/trim.decorator"
 
 export class CreatePostForBlogInputDto {
@@ -24,7 +24,7 @@ export class CreatePostForBlogInputDto {
 export class CreatePostInputDto extends CreatePostForBlogInputDto {
     @IsString()
     @IsNotEmpty()
-    @IsMongoId()
+    @IsUUID()
     blogId: string
 }
 

@@ -112,7 +112,7 @@ const commandHandlers = [
     RequestsRepository,
     RequestsQueryRepository,
     SessionsRepository,
-    SessionsQueryRepository
+    SessionsQueryRepository,
   ],
   exports: [
     UsersService,
